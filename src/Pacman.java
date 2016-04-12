@@ -7,21 +7,92 @@ public class Pacman extends Ghost {
 
     private int step = 1;
 
+    /*
+    0 = right
+    1 = up
+    2 = left
+    3 = down
+     */
+    private int tack = 2;
+    private int nexttack = tack;
+
     public Pacman(String path) {
         super(path);
     }
 
-    public boolean moveRight() {/*
-        if (!(getObjektBei(getX() + step, getY()) instanceof Wall)) {
-                if (this.getX() + this.getSize().getWidth() < this.getParent().getWidth()) {
-                    setBounds(this.getX() + step, this.getY(), this.getBounds().width, this.getBounds().height);
+    public boolean move() {
+        switch (tack) {
+            //RIGHT
+            case 0:
+                if (!(getObjektBei(getX() + step, getY()) instanceof Wall)) {
+                    if (this.getX() + this.getSize().getWidth() < this.getParent().getWidth()) {
+                        setBounds(this.getX() + step, this.getY(), this.getBounds().width, this.getBounds().height);
+                        return false;
+                    } else
+                        setBounds(-step, this.getY(), this.getWidth(), this.getWidth());
                     return false;
                 }
-            else
+                return true;
+            //UP
+            case 1:
+                if (!(getObjektBei(getX(), getY() - step) instanceof Wall)) {
+                    if (0 < this.getY()) {
+                        setBounds(this.getX(), this.getY() - step, this.getBounds().width, this.getBounds().height);
+                        return false;
+                    }
+                }
+                return true;
+            //LEFT
+            case 2:
+                if (!(getObjektBei(getX() - step, getY()) instanceof Wall)) {
+                    if (0 < this.getX()) {
+                        setBounds(this.getX() - step, this.getY(), this.getBounds().width, this.getBounds().height);
+                        return false;
+                    } else
+                        setBounds(this.getParent().getWidth() - step, this.getY(), this.getWidth(), this.getWidth());
+                    return false;
+                }
+                return true;
+            //DOWN
+            case 3:
+                if (!(getObjektBei(getX(), getY() + step) instanceof Wall)) {
+                    if (this.getY() + this.getSize().getHeight() < this.getParent().getHeight()) {
+                        setBounds(this.getX(), this.getY() + step, this.getBounds().width, this.getBounds().height);
+                        return false;
+                    }
+                }
+                return true;
+        }
+        return false;
+    }
+
+    public int getNexttack() {
+        return nexttack;
+    }
+
+    public void setNexttack(int nexttack) {
+        this.nexttack = nexttack;
+    }
+
+    public int getTack() {
+        return tack;
+    }
+
+    public void setTack(int tack) {
+        this.tack = tack;
+    }
+
+    /*
+    public boolean moveRight() {
+        if (!(getObjektBei(getX() + step, getY()) instanceof Wall)) {
+            if (this.getX() + this.getSize().getWidth() < this.getParent().getWidth()) {
+                setBounds(this.getX() + step, this.getY(), this.getBounds().width, this.getBounds().height);
+                return false;
+            } else
                 setBounds(-step, this.getY(), this.getWidth(), this.getWidth());
             return false;
         }
-        return true;*/
+        return true;
         if (!(getObjektBei(getX() + step, getY()) instanceof Wall)) {
             if (this.getX() + this.getSize().getWidth() < this.getParent().getWidth()) {
                 setBounds(this.getX() + step, this.getY(), this.getBounds().width, this.getBounds().height);
@@ -64,6 +135,7 @@ public class Pacman extends Ghost {
         }
         return true;
     }
+*/
 
     /**
      * Kontrolliert ob das Objekt - verschoben zur übergebenen x- und y-Position - mit
