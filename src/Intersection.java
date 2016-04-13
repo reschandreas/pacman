@@ -17,7 +17,7 @@ public class Intersection extends JComponent {
         this.down = down;
         this.right = right;
         this.left = left;
-        //setVisible(false);
+        setVisible(false);
     }
 
     public void paint(Graphics g) {

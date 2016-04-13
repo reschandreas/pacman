@@ -1,9 +1,9 @@
 /**
  * Created by Andreas on 03.04.16.
  */
-public class Prey extends Wall {
+public class Dot extends Wall {
 
-    public Prey(String path) {
+    public Dot(String path) {
         super(path);
     }
 }
