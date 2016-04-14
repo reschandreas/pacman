@@ -21,9 +21,9 @@
 232;168;false;true;true;false
 184;168;false;true;false;true
 136;216;false;true;true;false
-184;216;false;true;true;true
+184;216;true;false;true;true
 232;216;true;false;true;true
-280;216;false;true;true;false
+280;216;false;true;true;true
 88;264;true;true;true;true
 136;264;true;true;false;true
 280;264;true;true;true;false
@@ -54,7 +54,7 @@
 184;456;false;true;false;true
 232;456;false;true;true;false
 280;456;true;false;false;true
-328;456;false;true;true;false
+328;456;true;false;true;false
 376;456;true;down;true;true
 408;456;false;true;false;true
 8;504;true;false;true;false

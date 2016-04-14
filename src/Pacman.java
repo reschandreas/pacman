@@ -5,55 +5,73 @@ import java.awt.*;
  */
 public class Pacman extends Ghost {
 
-    private int step = 1;
+    private int x_speed = 0;
+    private int y_speed = 0;
 
+    private int x_next = 0;
+    private int y_next = 0;
 
     public Pacman(String path) {
         super(path);
     }
 
-    public boolean moveRight() {
-        if (!(getObjektBei(getX() + step, getY()) instanceof Wall)) {
-            if (this.getX() + this.getSize().getWidth() < this.getParent().getWidth()) {
-                setBounds(this.getX() + step, this.getY(), this.getBounds().width, this.getBounds().height);
-                return false;
-            } else
-                setBounds(-step, this.getY(), this.getWidth(), this.getWidth());
-            return false;
-        }
-        return true;
+    public int getX_next() {
+        return x_next;
     }
 
-    public boolean moveLeft() {
-        if (!(getObjektBei(getX() - step, getY()) instanceof Wall)) {
-            if (0 < this.getX()) {
-                setBounds(this.getX() - step, this.getY(), this.getBounds().width, this.getBounds().height);
-                return false;
-            } else
-                setBounds(this.getParent().getWidth() - step, this.getY(), this.getWidth(), this.getWidth());
-            return false;
-        }
-        return true;
+    public void setX_next(int x_next) {
+        this.x_next = x_next;
+        y_next = 0;
     }
 
-    public boolean moveUp() {
-        if (!(getObjektBei(getX(), getY() - step) instanceof Wall)) {
-            if (0 < this.getY()) {
-                setBounds(this.getX(), this.getY() - step, this.getBounds().width, this.getBounds().height);
-                return false;
+    public int getX_speed() {
+        return x_speed;
+    }
+
+    public void setX_speed(int x_speed) {
+        this.x_speed = x_speed;
+    }
+
+    public int getY_next() {
+        return y_next;
+    }
+
+    public void setY_next(int y_next) {
+        this.y_next = y_next;
+        x_next = 0;
+    }
+
+    public int getY_speed() {
+        return y_speed;
+    }
+
+    public void setY_speed(int y_speed) {
+        this.y_speed = y_speed;
+    }
+
+    public void reset() {
+        x_speed = x_next;
+        y_speed = y_next;
+    }
+
+    public void move() {
+        Intersection intersection = PacmanGUI.intersectionCheck();
+        if (intersection != null)
+            reset();
+        if (x_speed == 1 || x_speed == -1) {
+            if (x_speed == -1 && getX() < 0) {
+                setBounds(getParent().getWidth(), getY(), getWidth(), getHeight());
+            } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
+                setBounds(x_speed, getY(), getWidth(), getHeight());
+            } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
+                setBounds(this.getX() + x_speed, this.getY(), this.getBounds().width, this.getBounds().height);
+            }
+        } else if (y_speed == 1 || y_speed == -1) {
+
+            if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
+                setBounds(this.getX(), this.getY() + y_speed, this.getBounds().width, this.getBounds().height);
             }
         }
-        return true;
-    }
-
-    public boolean moveDown() {
-        if (!(getObjektBei(getX(), getY() + step) instanceof Wall)) {
-            if (this.getY() + this.getSize().getHeight() < this.getParent().getHeight()) {
-                setBounds(this.getX(), this.getY() + step, this.getBounds().width, this.getBounds().height);
-                return false;
-            }
-        }
-        return true;
     }
 
     /**

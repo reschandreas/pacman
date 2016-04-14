@@ -31,9 +31,9 @@ public class PacmanGUI extends JFrame {
     private Random random = new Random();
 
     private ArrayList<Wall> walls = new ArrayList<>();
-    private ArrayList<Intersection> intersections = new ArrayList<>();
+    private static ArrayList<Intersection> intersections = new ArrayList<>();
 
-    final private Pacman pacman = new Pacman("images/pacman_right.png");
+    static final private Pacman pacman = new Pacman("images/pacman_right.png");
     private Ghost ghost_blue = new Ghost("images/ghost_pink.png");
     private Thread moveThread;
     private Container container;
@@ -53,6 +53,7 @@ public class PacmanGUI extends JFrame {
 
         //Startpunkt
         pacman.setBounds(208, 408, pacman.getWidth(), pacman.getHeight());
+        pacman.setX_speed(-1);
         container.setBackground(Color.black);
         //Loadingscreen
         JWindow window = new JWindow();
@@ -101,104 +102,67 @@ public class PacmanGUI extends JFrame {
         });
 
         addKeyListener(new KeyListener() {
+                           @Override
+                           public void keyTyped(KeyEvent e) {
+                           }
 
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
+                           @Override
+                           public void keyPressed(final KeyEvent e) {
+                               switch (e.getKeyCode()) {
+                                   case KeyEvent.VK_P: {
+                                       System.out.println(pacman.getX() + "\t" + pacman.getY() + "\n");
+                                   }
+                               }
+                           }
 
+                           @Override
+                           public void keyReleased(final KeyEvent e) {
+                               switch (e.getKeyCode()) {
+                                   //UP
+                                   case KeyEvent.VK_W:
+                                       pacman.setY_next(-1);
+                                       break;
+                                   //DOWN
+                                   case KeyEvent.VK_S:
+                                       pacman.setY_next(1);
+                                       break;
+                                   //LEFT
+                                   case KeyEvent.VK_A:
+                                       pacman.setX_next(-1);
+                                       break;
+                                   //RIGHT
+                                   case KeyEvent.VK_D:
+                                       pacman.setX_next(1);
+                                       break;
+                               }
+                           }
+                       }
+
+        );
+        moveThread = new Thread(new Runnable() {
             @Override
-            public void keyPressed(final KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_P: {
-                        System.out.println(pacman.getX() + "\t" + pacman.getY() + "\n");
+            public void run() {
+                while(true) {
+                    pacman.move();
+                    try {
+                        Thread.sleep(FRAMERATE);
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
-
-            @Override
-            public void keyReleased(final KeyEvent e) {
-                moveThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        switch (e.getKeyCode()) {
-                            //UP
-                            case KeyEvent.VK_W:
-                                if (!up) {
-                                    up = true;
-                                    down = false;
-                                    right = false;
-                                    left = false;
-                                    while (!down && !pacman.moveUp() && (!intersectionCheck() || up)) {
-                                        try {
-                                            Thread.sleep(FRAMERATE);
-                                        } catch (InterruptedException ignored) {
-                                        }
-                                    }
-                                }
-                                break;
-                            //DOWN
-                            case KeyEvent.VK_S:
-                                if (!down) {
-                                    up = false;
-                                    down = true;
-                                    right = false;
-                                    left = false;
-                                    while (!up && !pacman.moveDown() && (!intersectionCheck() || down)) {
-                                        try {
-                                            Thread.sleep(FRAMERATE);
-                                        } catch (InterruptedException ignored) {
-                                        }
-                                    }
-                                }
-                                break;
-                            //LEFT
-                            case KeyEvent.VK_A:
-                                if (!left) {
-                                    up = false;
-                                    down = false;
-                                    right = false;
-                                    left = true;
-                                    while (!right && !pacman.moveLeft() && (!intersectionCheck() || left)) {
-                                        try {
-                                            Thread.sleep(FRAMERATE);
-                                        } catch (InterruptedException ignored) {
-                                        }
-                                    }
-                                }
-                                break;
-                            //RIGHT
-                            case KeyEvent.VK_D:
-                                if (!right) {
-                                    up = false;
-                                    down = false;
-                                    right = true;
-                                    left = false;
-                                    while (!left && !pacman.moveRight() && (!intersectionCheck() || right)) {
-                                        try {
-                                            Thread.sleep(FRAMERATE);
-                                        } catch (InterruptedException ignored) {
-                                        }
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                });
-
-                moveThread.start();
-            }
         });
+        moveThread.start();
         setVisible(true);
 
     }
 
-    private boolean intersectionCheck() {
+    public static Intersection intersectionCheck() {
         for (Intersection i : intersections) {
             if (pacman.getX() == i.getX() && pacman.getY() == i.getY()) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return null;
     }
 
     private void drawMaze() {
