@@ -3,7 +3,10 @@
  */
 public class Dot extends Wall {
 
-    public Dot(String path) {
+    public Dot(int x, int y, String path) {
         super(path);
+        setBounds(x, y, getWidth(), getHeight());
     }
+
+
 }

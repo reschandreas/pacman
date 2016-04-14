@@ -32,11 +32,16 @@ public class PacmanGUI extends JFrame {
 
     private ArrayList<Wall> walls = new ArrayList<>();
     private static ArrayList<Intersection> intersections = new ArrayList<>();
+    private ArrayList<Dot> dots = new ArrayList<>();
+    private ArrayList<Tile> tiles = new ArrayList<>();
 
     static final private Pacman pacman = new Pacman("images/pacman_right.png");
-    private Ghost ghost_blue = new Ghost("images/ghost_pink.png");
+    private Blinky blinky = new Blinky("images/ghost_red.png");
     private Thread moveThread;
+    private Thread blinkyThread;
     private Container container;
+
+    private int i = 0;
 
     private final int FRAMERATE = 3;
 
@@ -70,8 +75,7 @@ public class PacmanGUI extends JFrame {
         }
         window.dispose();
 
-        ghost_blue.setBounds(random.nextInt(WIDTH / 30) * 30, random.nextInt(HEIGHT / 30) * 30, ghost_blue.getWidth(), ghost_blue.getHeight());
-        container.add(ghost_blue);
+        container.add(blinky);
         container.add(pacman);
 
         addMouseListener(new MouseListener() {
@@ -110,7 +114,10 @@ public class PacmanGUI extends JFrame {
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
                                    case KeyEvent.VK_P: {
-                                       System.out.println(pacman.getX() + "\t" + pacman.getY() + "\n");
+                                       //System.out.println(pacman.getX() + "\t" + pacman.getY() + "\n");
+                                       dots.add(new Dot(pacman.getX() + 12, pacman.getY() + 12, "images/dots.png"));
+                                       System.out.println(dots.get(i).getX() + "" + dots.get(i).getY());
+                                       container.add(dots.get(i++));
                                    }
                                }
                            }
@@ -146,12 +153,24 @@ public class PacmanGUI extends JFrame {
                     pacman.move();
                     try {
                         Thread.sleep(FRAMERATE);
+                    } catch (InterruptedException ignored) {}
+                }
+            }
+        });
+        moveThread.start();
+
+        blinkyThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(FRAMERATE);
                     } catch (InterruptedException ignored) {
                     }
                 }
             }
         });
-        moveThread.start();
+        blinkyThread.start();
         setVisible(true);
 
     }
@@ -208,19 +227,27 @@ public class PacmanGUI extends JFrame {
         } catch (IOException e) {
             System.out.println("Error happened");
         }
+       int k = 0;
+        for (int i = 56; i < HEIGHT; i += RESOLUTION) {
+            for (int j = 8; j < WIDTH; j += RESOLUTION) {
+                dots.add(new Dot(j + 12, i + 12, "images/dots.png"));
+                container.add(dots.get(k));
+            }
+        }
     }
 
     @Override
     public void paint(Graphics g) {
         Insets insets = getInsets();
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.setColor(Color.green);
+        //g.setColor(Color.green);
+        /*
         for (int i = insets.top; i < HEIGHT; i += RESOLUTION) {
             g.drawLine(0, i, HEIGHT, i);
         }
         for (int i = 0; i < WIDTH; i += RESOLUTION) {
             g.drawLine(i, insets.top, i, HEIGHT);
-        }
+        }*/
         for (Component component : container.getComponents()) {
             component.repaint();
         }

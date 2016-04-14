@@ -13,6 +13,8 @@ public class Pacman extends Ghost {
 
     public Pacman(String path) {
         super(path);
+        x_speed = -1;
+        x_next = -1;
     }
 
     public int getX_next() {
@@ -49,29 +51,44 @@ public class Pacman extends Ghost {
         this.y_speed = y_speed;
     }
 
-    public void reset() {
+    private void reset() {
         x_speed = x_next;
         y_speed = y_next;
     }
 
     public void move() {
         Intersection intersection = PacmanGUI.intersectionCheck();
-        if (intersection != null)
-            reset();
-        if (x_speed == 1 || x_speed == -1) {
-            if (x_speed == -1 && getX() < 0) {
-                setBounds(getParent().getWidth(), getY(), getWidth(), getHeight());
-            } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
-                setBounds(x_speed, getY(), getWidth(), getHeight());
-            } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
-                setBounds(this.getX() + x_speed, this.getY(), this.getBounds().width, this.getBounds().height);
+        if (intersection == null) {
+            if (x_speed == 1 || x_speed == -1) {
+                if (x_speed == -1 && getX() < 0) {
+                    setBounds(getParent().getWidth(), getY(), getWidth(), getHeight());
+                } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
+                    setBounds(x_speed, getY(), getWidth(), getHeight());
+                } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
+                    setBounds(this.getX() + x_speed, this.getY(), this.getBounds().width, this.getBounds().height);
+                }
+            } else if (y_speed == 1 || y_speed == -1) {
+                if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
+                    setBounds(this.getX(), this.getY() + y_speed, this.getBounds().width, this.getBounds().height);
+                }
             }
-        } else if (y_speed == 1 || y_speed == -1) {
-
-            if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
-                setBounds(this.getX(), this.getY() + y_speed, this.getBounds().width, this.getBounds().height);
+        } else {
+            reset();
+            if (x_speed == 1 || x_speed == -1) {
+                if (x_speed == -1 && getX() < 0) {
+                    setBounds(getParent().getWidth(), getY(), getWidth(), getHeight());
+                } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
+                    setBounds(x_speed, getY(), getWidth(), getHeight());
+                } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
+                    setBounds(this.getX() + x_speed, this.getY(), this.getBounds().width, this.getBounds().height);
+                }
+            } else if (y_speed == 1 || y_speed == -1) {
+                if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
+                    setBounds(this.getX(), this.getY() + y_speed, this.getBounds().width, this.getBounds().height);
+                }
             }
         }
+
     }
 
     /**
