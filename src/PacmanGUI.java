@@ -108,9 +108,7 @@ public class PacmanGUI extends JFrame {
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
                                    case KeyEvent.VK_P: {
-                                       for (Dot dot : dots) {
-                                           System.out.println(dot.getX() + ";" + dot.getY());
-                                       }
+                                           System.out.println(pacman.getX() + "\t" + pacman.getY());
                                    }
                                }
                            }
@@ -265,6 +263,7 @@ public class PacmanGUI extends JFrame {
             while (true) {
                 String line = reader.readLine();
                 if (line == null || line.isEmpty())
+                    // Dateiende erkannt
                     break;
                 else {
                     String[] strings = line.split(";");
@@ -273,6 +272,7 @@ public class PacmanGUI extends JFrame {
                     dots.add(dot);
                 }
             }
+            reader.close();
         } catch (FileNotFoundException e) {
             System.out.println("dots.txt not found");
         } catch (IOException e) {

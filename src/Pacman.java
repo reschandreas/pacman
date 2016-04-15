@@ -57,39 +57,41 @@ public class Pacman extends Ghost {
     }
 
     private void moveHorizontal() {
-        if (x_speed == -1 && getX() < 0) {
-            setBounds(getParent().getWidth(), getY(), getWidth(), getHeight());
-        } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
-            setBounds(x_speed, getY(), getWidth(), getHeight());
-        } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
-            setBounds(this.getX() + x_speed, this.getY(), this.getBounds().width, this.getBounds().height);
+        if (x_speed == 1 || x_speed == -1) {
+            if (x_speed == -1 && getX() < 0) {
+                setLocation(getParent().getWidth(), getY());
+            } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
+                setLocation(x_speed, getY());
+            } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
+                setLocation(getX() + x_speed, getY());
+            }
         }
     }
 
     private void moveVertical() {
-        if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
-            setBounds(this.getX(), this.getY() + y_speed, this.getBounds().width, this.getBounds().height);
+        if (y_speed == 1 || y_speed == -1) {
+            if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
+                setLocation(getX(), getY() + y_speed);
+            }
         }
     }
 
     public void move() {
         Intersection intersection = PacmanGUI.intersectionCheck();
-        if (intersection == null) {
-            if (x_speed == 1 || x_speed == -1) {
-                moveHorizontal();
-            } else if (y_speed == 1 || y_speed == -1) {
-                moveVertical();
-            }
-        } else {
+        if (intersection != null && (intersection.isLeft() && x_next == -1 || intersection.isRight() && x_next == 1
+                || intersection.isUp() && y_next == -1 || intersection.isDown() && y_next == 1)) {
             reset();
-            if (x_speed == 1 || x_speed == -1) {
-                moveHorizontal();
-            } else if (y_speed == 1 || y_speed == -1) {
-                moveVertical();
-            }
+            moveHorizontal();
+            moveVertical();
+        } else {
+            intersection = null;
         }
-
+        if (intersection == null) {
+            moveHorizontal();
+            moveVertical();
     }
+
+}
 
     /**
      * Kontrolliert ob das Objekt - verschoben zur Ã¼bergebenen x- und y-Position - mit
