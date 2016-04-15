@@ -1,5 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -7,8 +5,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -40,8 +36,6 @@ public class PacmanGUI extends JFrame {
     private Thread moveThread;
     private Thread blinkyThread;
     private Container container;
-
-    private int i = 0;
 
     private final int FRAMERATE = 3;
 
@@ -114,10 +108,9 @@ public class PacmanGUI extends JFrame {
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
                                    case KeyEvent.VK_P: {
-                                       //System.out.println(pacman.getX() + "\t" + pacman.getY() + "\n");
-                                       dots.add(new Dot(pacman.getX() + 12, pacman.getY() + 12, "images/dots.png"));
-                                       System.out.println(dots.get(i).getX() + "" + dots.get(i).getY());
-                                       container.add(dots.get(i++));
+                                       for (Dot dot : dots) {
+                                           System.out.println(dot.getX() + ";" + dot.getY());
+                                       }
                                    }
                                }
                            }
@@ -149,17 +142,18 @@ public class PacmanGUI extends JFrame {
         moveThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     pacman.move();
                     try {
                         Thread.sleep(FRAMERATE);
-                    } catch (InterruptedException ignored) {}
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             }
         });
         moveThread.start();
 
-        blinkyThread = new Thread(new Runnable() {
+/*        blinkyThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -170,9 +164,47 @@ public class PacmanGUI extends JFrame {
                 }
             }
         });
-        blinkyThread.start();
+        blinkyThread.start();*/
+/*        int k = 0;
+        for (int i = 0; i < HEIGHT; i += RESOLUTION) {
+            for (int j = 0; j < WIDTH; j += RESOLUTION) {
+                dots.add(new Dot(j + 6, i + 6, "images/dots.png"));
+                //tiles.add(new Tile(j, i, dots.get(k)));
+                container.add(dots.get(k++));
+                //container.add(tiles.get(k++));
+            }
+        }*/
         setVisible(true);
 
+    }
+
+    public Component getObjektBei(int x, int y) {
+        Component ret = null;
+        if (this.getParent() != null) {
+            // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt
+            if (x < 0 || y < 0 || x + this.getWidth() > this.getParent().getWidth() ||
+                    y + this.getHeight() > this.getParent().getHeight())
+                // In diesem Fall wird der contentPane des Formulars Ã¼bergeben
+                ret = this.getParent();
+            else {
+                // Kontrolliere ob sich die neue Position mit anderen Objekten Ã¼berdeckt
+                Rectangle neuePosition =
+                        new Rectangle(x, y, this.getWidth(), this.getHeight());
+                // Gehe alle Objekte des Formulars durch und vergleiche ihre Position mit der
+                // neuen Position
+                Component[] komponenten = this.getParent().getComponents();
+                int i = 0;
+                while (komponenten != null && i < komponenten.length && ret == null) {
+                    // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
+                    // mit dem zu Kontrollierendem zusammenfÃ¤llt
+                    if (komponenten[i] != this &&
+                            neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Wall))
+                        ret = komponenten[i];
+                    i++;
+                }
+            }
+        }
+        return ret;
     }
 
     public static Intersection intersectionCheck() {
@@ -186,7 +218,7 @@ public class PacmanGUI extends JFrame {
 
     private void drawMaze() {
         //Zeichne Mauern aus der Datei maze.txt
-        try {
+       try {
             BufferedReader reader = new BufferedReader(new FileReader("maze.txt"));
             while (true) {
                 String line = reader.readLine();
@@ -227,12 +259,24 @@ public class PacmanGUI extends JFrame {
         } catch (IOException e) {
             System.out.println("Error happened");
         }
-       int k = 0;
-        for (int i = 56; i < HEIGHT; i += RESOLUTION) {
-            for (int j = 8; j < WIDTH; j += RESOLUTION) {
-                dots.add(new Dot(j + 12, i + 12, "images/dots.png"));
-                container.add(dots.get(k));
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("dots.txt"));
+            while (true) {
+                String line = reader.readLine();
+                if (line == null || line.isEmpty())
+                    break;
+                else {
+                    String[] strings = line.split(";");
+                    Dot dot = new Dot(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), "images/dots.png");
+                    container.add(dot);
+                    dots.add(dot);
+                }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("dots.txt not found");
+        } catch (IOException e) {
+            System.out.println("Error happened");
         }
     }
 
