@@ -6,11 +6,8 @@ import java.awt.*;
  */
 public class Tile extends JComponent {
 
-    private Dot dot;
-
-    public Tile(int x, int y, Dot dot) {
+    public Tile(int x, int y) {
         setBounds(x, y, PacmanGUI.RESOLUTION, PacmanGUI.RESOLUTION);
-        this.dot = dot;
         setVisible(false);
     }
 

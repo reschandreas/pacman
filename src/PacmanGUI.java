@@ -26,7 +26,11 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Tile> tiles = new ArrayList<>();
 
     static final private Pacman pacman = new Pacman("images/pacman_up.png", "images/pacman_down.png", "images/pacman_left.png", "images/pacman_right.png");
+
     private Blinky blinky = new Blinky("images/ghost_red.png");
+    private Inky inky = new Inky("images/ghost_blue.png");
+    private Pinky pinky = new Pinky("images/ghost_pink.png");
+    private Clyde clyde = new Clyde("images/ghost_orange.png");
     private Thread moveThread;
     private Thread blinkyThread;
     private Container container;
@@ -77,6 +81,10 @@ public class PacmanGUI extends JFrame {
         window.dispose();
 
         container.add(blinky);
+        container.add(inky);
+        container.add(pinky);
+        container.add(clyde);
+
         container.add(pacman);
 
         addKeyListener(new KeyListener() {
@@ -88,7 +96,7 @@ public class PacmanGUI extends JFrame {
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
                                    case KeyEvent.VK_P: {
-                                           System.out.println(pacman.getX() + "\t" + pacman.getY());
+                                       System.out.println(pacman.getX() + "\t" + pacman.getY());
                                    }
                                }
                            }
@@ -120,7 +128,7 @@ public class PacmanGUI extends JFrame {
         moveThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (!dots.isEmpty()) {
                     pacman.move();
                     eatenDots();
                     try {
@@ -174,7 +182,7 @@ public class PacmanGUI extends JFrame {
 
     }
 
-    public void eatenDots() {
+    private void eatenDots() {
         for (int i = 0; i < dots.size(); i++) {
             if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
                     || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
@@ -199,7 +207,7 @@ public class PacmanGUI extends JFrame {
 
     private void drawMaze() {
         //Zeichne Mauern aus der Datei maze.txt
-       try {
+        try {
             BufferedReader reader = new BufferedReader(new FileReader("maze.txt"));
             while (true) {
                 String line = reader.readLine();
@@ -265,11 +273,18 @@ public class PacmanGUI extends JFrame {
         } catch (IOException e) {
             System.out.println("Error happened");
         }
+
+        for (int i = 0; i < WIDTH; i += RESOLUTION) {
+            for (int j = 0; j < HEIGHT; j += RESOLUTION) {
+                Tile tile = new Tile(i, j);
+                tiles.add(tile);
+                container.add(tile);
+            }
+        }
     }
 
     @Override
     public void paint(Graphics g) {
-        Insets insets = getInsets();
         g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(Color.green);
         for (Component component : container.getComponents()) {

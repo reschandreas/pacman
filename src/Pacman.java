@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 /**
  * Created by Andreas on 03.04.16.
  */
-public class Pacman extends Ghost {
+public class Pacman extends Wall {
 
     private int x_speed = 0;
     private int y_speed = 0;
@@ -20,6 +20,7 @@ public class Pacman extends Ghost {
     private BufferedImage image_up;
     private BufferedImage image_down;
     private BufferedImage image_next;
+
     private int x_next = 0;
     private int y_next = 0;
 
@@ -32,11 +33,11 @@ public class Pacman extends Ghost {
     public Pacman(String up, String down, String left, String right) {
         this(left);
         try {
-            image_left = ImageIO.read(new File(getClass().getResource("images/pacman_left.png").toURI()));
+            image_left = ImageIO.read(new File(getClass().getResource(left).toURI()));
             image_next = image_left;
-            image_right = ImageIO.read(new File(getClass().getResource("images/pacman_right.png").toURI()));
-            image_up = ImageIO.read(new File(getClass().getResource("images/pacman_up.png").toURI()));
-            image_down = ImageIO.read(new File(getClass().getResource("images/pacman_down.png").toURI()));
+            image_right = ImageIO.read(new File(getClass().getResource(right).toURI()));
+            image_up = ImageIO.read(new File(getClass().getResource(up).toURI()));
+            image_down = ImageIO.read(new File(getClass().getResource(down).toURI()));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -93,7 +94,7 @@ public class Pacman extends Ghost {
         this.points = points;
     }
 
-    private void reset() {
+    private void changeDirection() {
         image = image_next;
         x_speed = x_next;
         y_speed = y_next;
@@ -131,7 +132,7 @@ public class Pacman extends Ghost {
         Intersection intersection = PacmanGUI.intersectionCheck();
         if (intersection != null && (intersection.isLeft() && x_next == -1 || intersection.isRight() && x_next == 1
                 || intersection.isUp() && y_next == -1 || intersection.isDown() && y_next == 1)) {
-            reset();
+            changeDirection();
             moveHorizontal();
             moveVertical();
         } else {
@@ -141,7 +142,6 @@ public class Pacman extends Ghost {
             moveHorizontal();
             moveVertical();
         }
-
     }
 
     /**
@@ -177,9 +177,8 @@ public class Pacman extends Ghost {
                 int i = 0;
                 while (komponenten != null && i < komponenten.length && ret == null) {
                     // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
-                    // mit dem zu Kontrollierendem zusammenfÃ¤llt
-                    if (komponenten[i] != this &&
-                            neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Ghost))
+                    // mit dem zu Kontrollierendem zusammenfällt
+                    if (komponenten[i] != this && neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Pacman))
                         ret = komponenten[i];
                     i++;
                 }

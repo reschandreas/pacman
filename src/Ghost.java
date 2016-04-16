@@ -1,7 +1,7 @@
 /**
  * Created by Andreas on 03.04.16.
  */
-public class Ghost extends Wall {
+public abstract class Ghost extends Pacman {
 
     public Ghost(String path) {
         super(path);
