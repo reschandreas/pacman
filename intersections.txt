@@ -30,7 +30,7 @@
 328;264;true;true;true;true
 136;312;true;true;true;false
 280;312;true;true;false;true
-8;360;false;true;false;true
+8;360;false;true;true;false
 136;360;true;false;true;true
 184;360;false;true;false;true
 232;360;false;true;true;false
@@ -45,7 +45,7 @@
 232;408;true;false;true;true
 280;408;false;true;true;true
 328;408;true;true;false;true
-376;408;down;true;false;true
+376;408;false;true;true;false
 408;408;true;false;false;true
 8;456;false;true;true;false
 40;456;true;false;true;true
@@ -55,7 +55,7 @@
 232;456;false;true;true;false
 280;456;true;false;false;true
 328;456;true;false;true;false
-376;456;true;down;true;true
+376;456;true;false;true;true
 408;456;false;true;false;true
 8;504;true;false;true;false
 184;504;true;false;true;true

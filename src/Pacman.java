@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -7,6 +8,7 @@ public class Pacman extends Ghost {
 
     private int x_speed = 0;
     private int y_speed = 0;
+    private long points = 0;
 
     private int x_next = 0;
     private int y_next = 0;
@@ -51,9 +53,25 @@ public class Pacman extends Ghost {
         this.y_speed = y_speed;
     }
 
+    public long getPoints() {
+        return points;
+    }
+
+    public void setPoints(long points) {
+        this.points = points;
+    }
+
     private void reset() {
         x_speed = x_next;
         y_speed = y_next;
+    }
+
+    public int getRealX() {
+        return getX() + getWidth() / 2;
+    }
+
+    public int getRealY() {
+        return getY() + getHeight() / 2;
     }
 
     private void moveHorizontal() {
@@ -89,9 +107,9 @@ public class Pacman extends Ghost {
         if (intersection == null) {
             moveHorizontal();
             moveVertical();
-    }
+        }
 
-}
+    }
 
     /**
      * Kontrolliert ob das Objekt - verschoben zur Ã¼bergebenen x- und y-Position - mit
@@ -108,7 +126,7 @@ public class Pacman extends Ghost {
      * zurÃ¼ck geliefert. Liefert null zurÃ¼ck, falls das Objekt ohne Ãœberdeckung an der
      * Ã¼bergebenen Position positioniert werden kann
      */
-    public Component getObjektBei(int x, int y) {
+    private Component getObjektBei(int x, int y) {
         Component ret = null;
         if (this.getParent() != null) {
             // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt

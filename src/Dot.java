@@ -9,11 +9,13 @@ public class Dot extends JComponent {
 
     protected Image image = null;
     protected String image_path = null;
+    protected int points;
 
     protected boolean dead = false;
 
-    public Dot(int x, int y, String path) {
+    public Dot( String path, int x, int y) {
         this(path);
+        points = 10;
         setLocation(x, y);
     }
 
@@ -38,6 +40,14 @@ public class Dot extends JComponent {
             // Stelle Größe des Objektes auf Größe des Bildes ein
             this.setSize(this.image.getWidth(this), this.image.getHeight(this));
         }
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     /**

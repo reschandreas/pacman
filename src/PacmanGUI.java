@@ -18,12 +18,6 @@ public class PacmanGUI extends JFrame {
     public final int WIDTH = 28 * RESOLUTION;
     public final int HEIGHT = 36 * RESOLUTION;
 
-
-    private boolean up;
-    private boolean down;
-    private boolean left;
-    private boolean right;
-
     private Random random = new Random();
 
     private ArrayList<Wall> walls = new ArrayList<>();
@@ -36,6 +30,9 @@ public class PacmanGUI extends JFrame {
     private Thread moveThread;
     private Thread blinkyThread;
     private Container container;
+
+    private JLabel l_scoretext;
+    private JLabel l_score;
 
     private final int FRAMERATE = 3;
 
@@ -62,6 +59,16 @@ public class PacmanGUI extends JFrame {
 
         drawMaze();
 
+        l_scoretext = new JLabel("Score: ");
+        l_scoretext.setBounds(0, 30, 50, 20);
+        l_scoretext.setForeground(Color.white);
+        container.add(l_scoretext);
+
+        l_score = new JLabel("0");
+        l_score.setBounds(50, 30, 40, 20);
+        l_score.setForeground(Color.white);
+        container.add(l_score);
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -71,33 +78,6 @@ public class PacmanGUI extends JFrame {
 
         container.add(blinky);
         container.add(pacman);
-
-        addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println(getMousePosition().getX() + "\t" + getMousePosition().getY());
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
 
         addKeyListener(new KeyListener() {
                            @Override
@@ -142,6 +122,7 @@ public class PacmanGUI extends JFrame {
             public void run() {
                 while (true) {
                     pacman.move();
+                    eatenDots();
                     try {
                         Thread.sleep(FRAMERATE);
                     } catch (InterruptedException ignored) {
@@ -151,6 +132,32 @@ public class PacmanGUI extends JFrame {
         });
         moveThread.start();
 
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println(getMousePosition().getX() + " " + getMousePosition().getY());
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 /*        blinkyThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -163,46 +170,22 @@ public class PacmanGUI extends JFrame {
             }
         });
         blinkyThread.start();*/
-/*        int k = 0;
-        for (int i = 0; i < HEIGHT; i += RESOLUTION) {
-            for (int j = 0; j < WIDTH; j += RESOLUTION) {
-                dots.add(new Dot(j + 6, i + 6, "images/dots.png"));
-                //tiles.add(new Tile(j, i, dots.get(k)));
-                container.add(dots.get(k++));
-                //container.add(tiles.get(k++));
-            }
-        }*/
         setVisible(true);
 
     }
 
-    public Component getObjektBei(int x, int y) {
-        Component ret = null;
-        if (this.getParent() != null) {
-            // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt
-            if (x < 0 || y < 0 || x + this.getWidth() > this.getParent().getWidth() ||
-                    y + this.getHeight() > this.getParent().getHeight())
-                // In diesem Fall wird der contentPane des Formulars Ã¼bergeben
-                ret = this.getParent();
-            else {
-                // Kontrolliere ob sich die neue Position mit anderen Objekten Ã¼berdeckt
-                Rectangle neuePosition =
-                        new Rectangle(x, y, this.getWidth(), this.getHeight());
-                // Gehe alle Objekte des Formulars durch und vergleiche ihre Position mit der
-                // neuen Position
-                Component[] komponenten = this.getParent().getComponents();
-                int i = 0;
-                while (komponenten != null && i < komponenten.length && ret == null) {
-                    // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
-                    // mit dem zu Kontrollierendem zusammenfÃ¤llt
-                    if (komponenten[i] != this &&
-                            neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Wall))
-                        ret = komponenten[i];
-                    i++;
-                }
+    public void eatenDots() {
+        for (int i = 0; i < dots.size(); i++) {
+            if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
+                    || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
+                dots.get(i).die();
+                pacman.setPoints(pacman.getPoints() + dots.get(i).points);
+                l_score.setText(String.valueOf(pacman.getPoints()));
+                dots.remove(i);
+                container.repaint();
+                break;
             }
         }
-        return ret;
     }
 
     public static Intersection intersectionCheck() {
@@ -267,7 +250,11 @@ public class PacmanGUI extends JFrame {
                     break;
                 else {
                     String[] strings = line.split(";");
-                    Dot dot = new Dot(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), "images/dots.png");
+                    Dot dot;
+                    if (strings[0].equals("images/energizer.png")) {
+                        dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                    } else
+                        dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
                     container.add(dot);
                     dots.add(dot);
                 }
@@ -284,14 +271,7 @@ public class PacmanGUI extends JFrame {
     public void paint(Graphics g) {
         Insets insets = getInsets();
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        //g.setColor(Color.green);
-        /*
-        for (int i = insets.top; i < HEIGHT; i += RESOLUTION) {
-            g.drawLine(0, i, HEIGHT, i);
-        }
-        for (int i = 0; i < WIDTH; i += RESOLUTION) {
-            g.drawLine(i, insets.top, i, HEIGHT);
-        }*/
+        g.setColor(Color.green);
         for (Component component : container.getComponents()) {
             component.repaint();
         }
