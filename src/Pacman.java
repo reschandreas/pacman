@@ -1,5 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -10,6 +15,11 @@ public class Pacman extends Ghost {
     private int y_speed = 0;
     private long points = 0;
 
+    private BufferedImage image_right;
+    private BufferedImage image_left;
+    private BufferedImage image_up;
+    private BufferedImage image_down;
+    private BufferedImage image_next;
     private int x_next = 0;
     private int y_next = 0;
 
@@ -19,12 +29,30 @@ public class Pacman extends Ghost {
         x_next = -1;
     }
 
+    public Pacman(String up, String down, String left, String right) {
+        this(left);
+        try {
+            image_left = ImageIO.read(new File(getClass().getResource("images/pacman_left.png").toURI()));
+            image_next = image_left;
+            image_right = ImageIO.read(new File(getClass().getResource("images/pacman_right.png").toURI()));
+            image_up = ImageIO.read(new File(getClass().getResource("images/pacman_up.png").toURI()));
+            image_down = ImageIO.read(new File(getClass().getResource("images/pacman_down.png").toURI()));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public int getX_next() {
         return x_next;
     }
 
     public void setX_next(int x_next) {
         this.x_next = x_next;
+        if (x_next == -1)
+            image_next = image_left;
+        else
+            image_next = image_right;
         y_next = 0;
     }
 
@@ -42,6 +70,10 @@ public class Pacman extends Ghost {
 
     public void setY_next(int y_next) {
         this.y_next = y_next;
+        if (y_next == -1)
+            image_next = image_up;
+        else
+            image_next = image_down;
         x_next = 0;
     }
 
@@ -62,6 +94,7 @@ public class Pacman extends Ghost {
     }
 
     private void reset() {
+        image = image_next;
         x_speed = x_next;
         y_speed = y_next;
     }

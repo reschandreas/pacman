@@ -25,7 +25,7 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
 
-    static final private Pacman pacman = new Pacman("images/pacman_right.png");
+    static final private Pacman pacman = new Pacman("images/pacman_up.png", "images/pacman_down.png", "images/pacman_left.png", "images/pacman_right.png");
     private Blinky blinky = new Blinky("images/ghost_red.png");
     private Thread moveThread;
     private Thread blinkyThread;
