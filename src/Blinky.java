@@ -4,10 +4,12 @@
  */
 public class Blinky extends Ghost {
 
-    private final int[] STARTPOS = {216, 216};
-
     public Blinky(String path) {
         super(path);
-        setLocation(STARTPOS[0], STARTPOS[1]);
+        startpos[0] = 216;
+        startpos[1] = 216;
+        setLocation(startpos[0], startpos[1]);
+        TARGET[0] = 400;
+        TARGET[1] = 0;
     }
 }

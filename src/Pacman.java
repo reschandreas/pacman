@@ -11,9 +11,13 @@ import java.net.URISyntaxException;
  */
 public class Pacman extends Wall {
 
-    private int x_speed = 0;
-    private int y_speed = 0;
+    protected int x_speed = 0;
+    protected int y_speed = 0;
     private long points = 0;
+
+    private int lives = 0;
+
+    protected int[] startpos = new int[2];
 
     private BufferedImage image_right;
     private BufferedImage image_left;
@@ -21,11 +25,15 @@ public class Pacman extends Wall {
     private BufferedImage image_down;
     private BufferedImage image_next;
 
-    private int x_next = 0;
-    private int y_next = 0;
+    protected int x_next = 0;
+    protected int y_next = 0;
 
     public Pacman(String path) {
         super(path);
+        startpos[0] = 208;
+        startpos[1] = 408;
+        setLocation(startpos[0], startpos[1]);
+        lives = 3;
         x_speed = -1;
         x_next = -1;
     }
@@ -42,6 +50,24 @@ public class Pacman extends Wall {
             e.printStackTrace();
         }
 
+    }
+
+    public void reStart() {
+        setLocation(startpos[0], startpos[1]);
+        lives = 3;
+        setLocation(startpos[0], startpos[1]);
+        points = 0;
+        x_speed = x_next = -1;
+        y_speed = y_next = 0;
+        image = image_next = image_left;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 
     public int getX_next() {
@@ -108,7 +134,7 @@ public class Pacman extends Wall {
         return getY() + getHeight() / 2;
     }
 
-    private void moveHorizontal() {
+    protected void moveHorizontal() {
         if (x_speed == 1 || x_speed == -1) {
             if (x_speed == -1 && getX() < 0) {
                 setLocation(getParent().getWidth(), getY());
@@ -120,7 +146,7 @@ public class Pacman extends Wall {
         }
     }
 
-    private void moveVertical() {
+    protected void moveVertical() {
         if (y_speed == 1 || y_speed == -1) {
             if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
                 setLocation(getX(), getY() + y_speed);

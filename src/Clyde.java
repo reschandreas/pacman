@@ -4,10 +4,12 @@
  */
 public class Clyde extends Ghost {
 
-    private final int[] STARTPOS = {176, 268};
-
     public Clyde(String path) {
         super(path);
-        setLocation(STARTPOS[0], STARTPOS[1]);
+        startpos[0] = 176;
+        startpos[1] = 268;
+        setLocation(startpos[0], startpos[1]);
+        TARGET[0] = 0;
+        TARGET[1] = 560;
     }
 }

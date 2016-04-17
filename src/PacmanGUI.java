@@ -1,3 +1,11 @@
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import sun.audio.AudioData;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -5,6 +13,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -31,6 +40,8 @@ public class PacmanGUI extends JFrame {
     private Inky inky = new Inky("images/ghost_blue.png");
     private Pinky pinky = new Pinky("images/ghost_pink.png");
     private Clyde clyde = new Clyde("images/ghost_orange.png");
+
+
     private Thread moveThread;
     private Thread blinkyThread;
     private Container container;
@@ -51,11 +62,36 @@ public class PacmanGUI extends JFrame {
         container = getContentPane();
         container.setLayout(null);
 
-        //Startpunkt
-        pacman.setBounds(208, 408, pacman.getWidth(), pacman.getHeight());
-        pacman.setX_speed(-1);
         container.setBackground(Color.black);
         //Loadingscreen
+
+/*        try
+        {
+            // get the sound file as a resource out of my jar file;
+            // the sound file must be in the same directory as this class file.
+            // the input stream portion of this recipe comes from a javaworld.com article.
+            InputStream inputStream = getClass().getResourceAsStream("sounds/pacman_beginning.wav");
+            AudioStream audioStream = new AudioStream(inputStream);
+            AudioPlayer.player.start(audioStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            // Open an audio input stream.
+            URL url = this.getClass().getClassLoader().getResource("sounds/pacman_beginning.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
+            // Get a sound clip resource.
+            Clip clip = AudioSystem.getClip();
+            // Open audio clip and load samples from the audio input stream.
+            clip.open(audioIn);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+        */
+
+
         JWindow window = new JWindow();
         window.setLocationRelativeTo(null);
         window.setBounds(getX(), getY(), WIDTH, HEIGHT);
@@ -128,14 +164,18 @@ public class PacmanGUI extends JFrame {
         moveThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!dots.isEmpty()) {
-                    pacman.move();
-                    eatenDots();
-                    try {
-                        Thread.sleep(FRAMERATE);
-                    } catch (InterruptedException ignored) {
+                do {
+                    while (!dots.isEmpty()) {
+                        pacman.move();
+                        eatenDots();
+                        try {
+                            Thread.sleep(FRAMERATE);
+                        } catch (InterruptedException ignored) {
+                        }
                     }
-                }
+                    newGame();
+                    drawMaze();
+                } while (true);
             }
         });
         moveThread.start();
@@ -143,7 +183,7 @@ public class PacmanGUI extends JFrame {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println(getMousePosition().getX() + " " + getMousePosition().getY());
+                System.out.println((int) getMousePosition().getX() + ";" + (int) getMousePosition().getY());
             }
 
             @Override
@@ -182,6 +222,10 @@ public class PacmanGUI extends JFrame {
 
     }
 
+    private void newGame() {
+        pacman.reStart();
+    }
+
     private void eatenDots() {
         for (int i = 0; i < dots.size(); i++) {
             if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
@@ -206,81 +250,116 @@ public class PacmanGUI extends JFrame {
     }
 
     private void drawMaze() {
-        //Zeichne Mauern aus der Datei maze.txt
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("maze.txt"));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || line.isEmpty())
-                    // Dateiende erkannt
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    Wall wall = new Wall(strings[0]);
-                    wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
-                    container.add(wall);
-                    walls.add(wall);
+        if (walls.isEmpty()) {
+            //Zeichne Mauern aus der Datei maze.txt
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader("maze.txt"));
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null || line.isEmpty())
+                        // Dateiende erkannt
+                        break;
+                    else {
+                        String[] strings = line.split(";");
+                        Wall wall = new Wall(strings[0]);
+                        wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
+                        container.add(wall);
+                        walls.add(wall);
+                    }
                 }
+                reader.close();
+            } catch (FileNotFoundException e) {
+                System.out.println("maze.txt not found");
+            } catch (IOException e) {
+                System.out.println("Error happened");
             }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("maze.txt not found");
-        } catch (IOException e) {
-            System.out.println("Error happened");
+        }
+        if (intersections.isEmpty()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader("intersections.txt"));
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null || line.isEmpty())
+                        break;
+                    else {
+                        String[] strings = line.split(";");
+                        Intersection intersection = new Intersection(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), Boolean.parseBoolean(strings[2]),
+                                Boolean.parseBoolean(strings[3]), Boolean.parseBoolean(strings[4]), Boolean.parseBoolean(strings[5]));
+                        container.add(intersection);
+                        intersections.add(intersection);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("intersections.txt not found");
+            } catch (IOException e) {
+                System.out.println("Error happened");
+            }
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("intersections.txt"));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || line.isEmpty())
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    Intersection intersection = new Intersection(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), Boolean.parseBoolean(strings[2]),
-                            Boolean.parseBoolean(strings[3]), Boolean.parseBoolean(strings[4]), Boolean.parseBoolean(strings[5]));
-                    container.add(intersection);
-                    intersections.add(intersection);
+        if (dots.isEmpty()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader("dots.txt"));
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null || line.isEmpty())
+                        // Dateiende erkannt
+                        break;
+                    else {
+                        String[] strings = line.split(";");
+                        Dot dot;
+                        if (strings[0].equals("images/energizer.png")) {
+                            dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                        } else
+                            dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                        container.add(dot);
+                        dots.add(dot);
+                    }
                 }
+                reader.close();
+            } catch (FileNotFoundException e) {
+                System.out.println("dots.txt not found");
+            } catch (IOException e) {
+                System.out.println("Error happened");
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("intersections.txt not found");
-        } catch (IOException e) {
-            System.out.println("Error happened");
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("dots.txt"));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || line.isEmpty())
-                    // Dateiende erkannt
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    Dot dot;
-                    if (strings[0].equals("images/energizer.png")) {
-                        dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
-                    } else
-                        dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
-                    container.add(dot);
-                    dots.add(dot);
+        if (tiles.isEmpty()) {
+            for (int i = 0; i < WIDTH; i += RESOLUTION) {
+                for (int j = 0; j < HEIGHT; j += RESOLUTION) {
+                    Tile tile = new Tile(i, j);
+                    tiles.add(tile);
+                    container.add(tile);
                 }
             }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("dots.txt not found");
-        } catch (IOException e) {
-            System.out.println("Error happened");
         }
+    }
 
-        for (int i = 0; i < WIDTH; i += RESOLUTION) {
-            for (int j = 0; j < HEIGHT; j += RESOLUTION) {
-                Tile tile = new Tile(i, j);
-                tiles.add(tile);
-                container.add(tile);
+    private Component getObjektBei(int x, int y) {
+        Component ret = null;
+        if (this.getParent() != null) {
+            // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt
+            if (x < 0 || y < 0 || x + this.getWidth() > this.getParent().getWidth() ||
+                    y + this.getHeight() > this.getParent().getHeight())
+                // In diesem Fall wird der contentPane des Formulars Ã¼bergeben
+                ret = this.getParent();
+            else {
+                // Kontrolliere ob sich die neue Position mit anderen Objekten Ã¼berdeckt
+                Rectangle neuePosition =
+                        new Rectangle(x, y, this.getWidth(), this.getHeight());
+                // Gehe alle Objekte des Formulars durch und vergleiche ihre Position mit der
+                // neuen Position
+                Component[] komponenten = this.getParent().getComponents();
+                int i = 0;
+                while (komponenten != null && i < komponenten.length && ret == null) {
+                    // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
+                    // mit dem zu Kontrollierendem zusammenfällt
+                    if (komponenten[i] != this && neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Pacman))
+                        ret = komponenten[i];
+                    i++;
+                }
             }
         }
+        return ret;
     }
 
     @Override

@@ -8,7 +8,6 @@ public class Tile extends JComponent {
 
     public Tile(int x, int y) {
         setBounds(x, y, PacmanGUI.RESOLUTION, PacmanGUI.RESOLUTION);
-        setVisible(false);
     }
 
     public void paint(Graphics g) {
@@ -16,4 +15,11 @@ public class Tile extends JComponent {
         g.drawRect(0, 0, this.getWidth(), this.getHeight());
     }
 
+    public int getRealX() {
+        return getX() + getWidth()/2;
+    }
+
+    public int getRealY() {
+        return getY() + getHeight()/2;
+    }
 }
