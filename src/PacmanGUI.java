@@ -179,7 +179,7 @@ public class PacmanGUI extends JFrame {
                     pinky.move();
                     clyde.move();
                     try {
-                        Thread.sleep(4, 5);
+                        Thread.sleep(5, 5);
                     } catch (InterruptedException ignored) {
                     }
                 }
