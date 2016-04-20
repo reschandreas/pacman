@@ -200,17 +200,22 @@ public class PacmanGUI extends JFrame {
     }
 
     private void eatenDots() {
-        for (int i = 0; i < dots.size(); i++) {
-            if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
-                    || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
-                dots.get(i).die();
-                pacman.setPoints(pacman.getPoints() + dots.get(i).points);
-                l_score.setText(String.valueOf(pacman.getPoints()));
-                dots.remove(i);
-                container.repaint();
-                break;
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < dots.size(); i++) {
+                    if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
+                            || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
+                        dots.get(i).die();
+                        pacman.setPoints(pacman.getPoints() + dots.get(i).points);
+                        l_score.setText(String.valueOf(pacman.getPoints()));
+                        dots.remove(i);
+                        container.repaint();
+                        break;
+                    }
+                }
             }
-        }
+        });
     }
 
     private void drawMaze() {
