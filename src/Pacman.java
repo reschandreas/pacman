@@ -19,11 +19,11 @@ public class Pacman extends Wall {
 
     protected int[] startpos = new int[2];
 
-    private BufferedImage image_right;
-    private BufferedImage image_left;
-    private BufferedImage image_up;
-    private BufferedImage image_down;
-    private BufferedImage image_next;
+    private BufferedImage image_right = null;
+    private BufferedImage image_left = null;
+    private BufferedImage image_up = null;
+    private BufferedImage image_down = null;
+    private BufferedImage image_next = null;
 
     protected int x_next = 0;
     protected int y_next = 0;
@@ -76,10 +76,11 @@ public class Pacman extends Wall {
 
     public void setX_next(int x_next) {
         this.x_next = x_next;
-        if (x_next == -1)
-            image_next = image_left;
-        else
-            image_next = image_right;
+        if (x_next == -1) {
+            if (image_left != null)
+                image_next = image_left;
+        } else if (image_right != null)
+                image_next = image_right;
         y_next = 0;
     }
 
@@ -97,10 +98,11 @@ public class Pacman extends Wall {
 
     public void setY_next(int y_next) {
         this.y_next = y_next;
-        if (y_next == -1)
-            image_next = image_up;
-        else
-            image_next = image_down;
+        if (y_next == -1) {
+            if (image_up != null)
+                image_next = image_up;
+        } else if (image_down != null)
+                image_next = image_down;
         x_next = 0;
     }
 
@@ -121,7 +123,8 @@ public class Pacman extends Wall {
     }
 
     private void changeDirection() {
-        image = image_next;
+        if (image_next != null)
+            image = image_next;
         x_speed = x_next;
         y_speed = y_next;
     }
@@ -155,7 +158,7 @@ public class Pacman extends Wall {
     }
 
     public void move() {
-        Intersection intersection = PacmanGUI.intersectionCheck();
+        Intersection intersection = intersectionCheck();
         if (intersection != null && (intersection.isLeft() && x_next == -1 || intersection.isRight() && x_next == 1
                 || intersection.isUp() && y_next == -1 || intersection.isDown() && y_next == 1)) {
             changeDirection();
@@ -168,6 +171,15 @@ public class Pacman extends Wall {
             moveHorizontal();
             moveVertical();
         }
+    }
+
+    protected Intersection intersectionCheck() {
+        for (Intersection i : PacmanGUI.intersections) {
+            if (getX() == i.getX() && getY() == i.getY()) {
+                return i;
+            }
+        }
+        return null;
     }
 
     /**
@@ -185,7 +197,7 @@ public class Pacman extends Wall {
      * zurÃ¼ck geliefert. Liefert null zurÃ¼ck, falls das Objekt ohne Ãœberdeckung an der
      * Ã¼bergebenen Position positioniert werden kann
      */
-    private Component getObjektBei(int x, int y) {
+    public Component getObjektBei(int x, int y) {
         Component ret = null;
         if (this.getParent() != null) {
             // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt

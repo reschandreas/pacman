@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,7 +12,7 @@ import java.net.URL;
  */
 public class Wall extends JComponent {
 
-    protected Image image = null;
+    protected BufferedImage image = null;
     protected String image_path = null;
 
     protected boolean dead = false;
@@ -60,7 +61,7 @@ public class Wall extends JComponent {
         return image;
     }
 
-    public void setImage(Image image) {
+    public void setImage(BufferedImage image) {
         this.image = image;
     }
 

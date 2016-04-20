@@ -1,11 +1,3 @@
-import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import sun.audio.AudioData;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
-
-import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,7 +22,7 @@ public class PacmanGUI extends JFrame {
     private Random random = new Random();
 
     private ArrayList<Wall> walls = new ArrayList<>();
-    private static ArrayList<Intersection> intersections = new ArrayList<>();
+    public static ArrayList<Intersection> intersections = new ArrayList<>();
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
 
@@ -40,7 +32,6 @@ public class PacmanGUI extends JFrame {
     private Inky inky = new Inky("images/ghost_blue.png");
     private Pinky pinky = new Pinky("images/ghost_pink.png");
     private Clyde clyde = new Clyde("images/ghost_orange.png");
-
 
     private Thread moveThread;
     private Thread blinkyThread;
@@ -64,34 +55,6 @@ public class PacmanGUI extends JFrame {
 
         container.setBackground(Color.black);
         //Loadingscreen
-
-/*        try
-        {
-            // get the sound file as a resource out of my jar file;
-            // the sound file must be in the same directory as this class file.
-            // the input stream portion of this recipe comes from a javaworld.com article.
-            InputStream inputStream = getClass().getResourceAsStream("sounds/pacman_beginning.wav");
-            AudioStream audioStream = new AudioStream(inputStream);
-            AudioPlayer.player.start(audioStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            // Open an audio input stream.
-            URL url = this.getClass().getClassLoader().getResource("sounds/pacman_beginning.wav");
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-            // Get a sound clip resource.
-            Clip clip = AudioSystem.getClip();
-            // Open audio clip and load samples from the audio input stream.
-            clip.open(audioIn);
-            clip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-        }
-        */
-
-
         JWindow window = new JWindow();
         window.setLocationRelativeTo(null);
         window.setBounds(getX(), getY(), WIDTH, HEIGHT);
@@ -206,20 +169,30 @@ public class PacmanGUI extends JFrame {
 
             }
         });
-/*        blinkyThread = new Thread(new Runnable() {
+        blinkyThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (!dots.isEmpty()) {
+                    blinky.move();
+                    blinky.setCurrent_target(new int[] {pacman.getRealX(), pacman.getRealY()});
+                    inky.move();
+                    pinky.move();
+                    clyde.move();
                     try {
-                        Thread.sleep(FRAMERATE);
+                        Thread.sleep(4, 5);
                     } catch (InterruptedException ignored) {
                     }
                 }
             }
         });
-        blinkyThread.start();*/
+        blinkyThread.start();
         setVisible(true);
 
+    }
+
+    private boolean catched() {
+
+        return false;
     }
 
     private void newGame() {
@@ -238,15 +211,6 @@ public class PacmanGUI extends JFrame {
                 break;
             }
         }
-    }
-
-    public static Intersection intersectionCheck() {
-        for (Intersection i : intersections) {
-            if (pacman.getX() == i.getX() && pacman.getY() == i.getY()) {
-                return i;
-            }
-        }
-        return null;
     }
 
     private void drawMaze() {
@@ -332,34 +296,6 @@ public class PacmanGUI extends JFrame {
                 }
             }
         }
-    }
-
-    private Component getObjektBei(int x, int y) {
-        Component ret = null;
-        if (this.getParent() != null) {
-            // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt
-            if (x < 0 || y < 0 || x + this.getWidth() > this.getParent().getWidth() ||
-                    y + this.getHeight() > this.getParent().getHeight())
-                // In diesem Fall wird der contentPane des Formulars Ã¼bergeben
-                ret = this.getParent();
-            else {
-                // Kontrolliere ob sich die neue Position mit anderen Objekten Ã¼berdeckt
-                Rectangle neuePosition =
-                        new Rectangle(x, y, this.getWidth(), this.getHeight());
-                // Gehe alle Objekte des Formulars durch und vergleiche ihre Position mit der
-                // neuen Position
-                Component[] komponenten = this.getParent().getComponents();
-                int i = 0;
-                while (komponenten != null && i < komponenten.length && ret == null) {
-                    // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
-                    // mit dem zu Kontrollierendem zusammenfällt
-                    if (komponenten[i] != this && neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Pacman))
-                        ret = komponenten[i];
-                    i++;
-                }
-            }
-        }
-        return ret;
     }
 
     @Override
