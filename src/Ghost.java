@@ -3,15 +3,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Andreas on 03.04.16.
  */
 public abstract class Ghost extends Pacman {
 
-    protected final int SCATTERMODE = 0;
-    protected final int CHASEMODE = 1;
-    protected final int FRIGHTENEDMODE = 2;
+    protected static final int SCATTERMODE = 0;
+    protected static final int CHASEMODE = 1;
+    protected static final int FRIGHTENEDMODE = 2;
+
+    private Random random = new Random();
 
     protected int current_mode = SCATTERMODE;
 
@@ -23,6 +26,7 @@ public abstract class Ghost extends Pacman {
         super(path, path, path, path);
         current_target[0] = target[0];
         current_target[1] = target[1];
+        current_mode = SCATTERMODE;
     }
 
     private int compareWays(int a, int b) {
@@ -58,25 +62,28 @@ public abstract class Ghost extends Pacman {
             int down = 0;
             int left = 0;
             int right = 0;
+            int way = 0;
             do {
                 if (up != -1)
-                    up = pythagoras(i.getX() + i.getWidth() / 2, i.getY());
+                    up = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY());
                 if (down != -1)
-                    down = pythagoras(i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
+                    down = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
                 if (left != -1)
-                    left = pythagoras(i.getX(), i.getY() + i.getHeight() / 2);
+                    left = pythagoras(current_target[0], current_target[1], i.getX(), i.getY() + i.getHeight() / 2);
                 if (right != -1)
-                    right = pythagoras(i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
+                    right = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
                 switch (getX_speed()) {
                     //Von rechts in die Kreuzung
                     case -1: {
-                        int way = compareWays(up, down, left);
-                        if (way == up)
-                            way = 1;
-                        else if (way == down)
-                            way = 2;
-                        else if (way == left)
-                            way = 3;
+                        if (current_mode != FRIGHTENEDMODE) {
+                            way = compareWays(up, down, left);
+                            if (way == up)
+                                way = 1;
+                            else if (way == down)
+                                way = 2;
+                            else if (way == left)
+                                way = 3;
+                        } else way = random.nextInt(3) + 1;
                         switch (way) {
                             case 1:
                                 if (i.isUp()) {
@@ -107,13 +114,15 @@ public abstract class Ghost extends Pacman {
                     }
                     //Von links in die Kreuzung
                     case 1: {
-                        int way = compareWays(up, down, right);
-                        if (way == up)
-                            way = 1;
-                        else if (way == down)
-                            way = 2;
-                        else if (way == right)
-                            way = 3;
+                        if (current_mode != FRIGHTENEDMODE) {
+                            way = compareWays(up, down, right);
+                            if (way == up)
+                                way = 1;
+                            else if (way == down)
+                                way = 2;
+                            else if (way == right)
+                                way = 3;
+                        } else way = random.nextInt(3) + 1;
                         switch (way) {
                             case 1:
                                 if (i.isUp()) {
@@ -145,13 +154,15 @@ public abstract class Ghost extends Pacman {
                 }
                 switch (getY_speed()) {
                     case -1: {
-                        int way = compareWays(up, left, right);
-                        if (way == up)
-                            way = 1;
-                        else if (way == left)
-                            way = 2;
-                        else if (way == right)
-                            way = 3;
+                        if (current_mode != FRIGHTENEDMODE) {
+                            way = compareWays(up, left, right);
+                            if (way == up)
+                                way = 1;
+                            else if (way == left)
+                                way = 2;
+                            else if (way == right)
+                                way = 3;
+                        } else way = random.nextInt(3) + 1;
                         switch (way) {
                             case 1:
                                 if (i.isUp()) {
@@ -178,13 +189,15 @@ public abstract class Ghost extends Pacman {
                         break;
                     }
                     case 1: {
-                        int way = compareWays(down, left, right);
-                        if (way == down)
-                            way = 1;
-                        else if (way == left)
-                            way = 2;
-                        else if (way == right)
-                            way = 3;
+                        if (current_mode != FRIGHTENEDMODE) {
+                            way = compareWays(down, left, right);
+                            if (way == down)
+                                way = 1;
+                            else if (way == left)
+                                way = 2;
+                            else if (way == right)
+                                way = 3;
+                        } else way = random.nextInt(3) + 1;
                         switch (way) {
                             case 1:
                                 if (i.isDown()) {
@@ -221,26 +234,46 @@ public abstract class Ghost extends Pacman {
         super.move();
     }
 
+    public int[] getTarget() {
+        return target;
+    }
+
     public void setCurrent_target(int[] current_target) {
         this.current_target = current_target;
     }
 
-    protected int pythagoras(int x, int y) {
-        return (int) Math.sqrt((Math.pow(current_target[0] - x, 2) + Math.pow(current_target[1] - y, 2)));
+    public int[] getCurrent_target() {
+        return current_target;
     }
 
-    protected void changeMode(int mode) {
+    protected int pythagoras(int targetx, int targety, int startx, int starty) {
+        return (int) Math.sqrt((Math.pow(targetx - startx, 2) + Math.pow(targety - starty, 2)));
+    }
+
+    protected void modes(int mode) {
         switch (mode) {
             case SCATTERMODE:
-                current_target = target.clone();
+                scatterMode();
                 break;
             case CHASEMODE:
-
+                chaseMode();
                 break;
             case FRIGHTENEDMODE:
-
+                frightenedMode();
                 break;
         }
+    }
+
+    protected void chaseMode() {
+
+    }
+
+    protected void scatterMode() {
+
+    }
+
+    protected void frightenedMode() {
+
     }
 
     private void reverse() {

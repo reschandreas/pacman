@@ -14,4 +14,23 @@ public class Clyde extends Ghost {
         target[0] = current_target[0] = 0;
         target[1] = current_target[1] = 560;
     }
+
+    @Override
+    protected void chaseMode() {
+        if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION)  {
+            setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+        } else {
+            setCurrent_target(target);
+        }
+    }
+
+    @Override
+    protected void frightenedMode() {
+        super.frightenedMode();
+    }
+
+    @Override
+    protected void scatterMode() {
+        super.scatterMode();
+    }
 }

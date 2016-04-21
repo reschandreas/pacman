@@ -5,7 +5,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -25,13 +24,8 @@ public class PacmanGUI extends JFrame {
     public static ArrayList<Intersection> intersections = new ArrayList<>();
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
-
-    static final private Pacman pacman = new Pacman("images/pacman_up.png", "images/pacman_down.png", "images/pacman_left.png", "images/pacman_right.png");
-
-    private Blinky blinky = new Blinky("images/ghost_red.png");
-    private Inky inky = new Inky("images/ghost_blue.png");
-    private Pinky pinky = new Pinky("images/ghost_pink.png");
-    private Clyde clyde = new Clyde("images/ghost_orange.png");
+    public static ArrayList<Ghost> ghosts = new ArrayList<>();
+    static final public Pacman pacman = new Pacman("images/pacman_up.png", "images/pacman_down.png", "images/pacman_left.png", "images/pacman_right.png");
 
     private Thread moveThread;
     private Thread blinkyThread;
@@ -79,10 +73,14 @@ public class PacmanGUI extends JFrame {
         }
         window.dispose();
 
-        container.add(blinky);
-        container.add(inky);
-        container.add(pinky);
-        container.add(clyde);
+        ghosts.add(new Blinky("images/ghost_red.png"));
+        container.add(ghosts.get(0));
+        ghosts.add(new Inky("images/ghost_blue.png"));
+        container.add(ghosts.get(1));
+        ghosts.add(new Pinky("images/ghost_pink.png"));
+        container.add(ghosts.get(2));
+        ghosts.add(new Clyde("images/ghost_orange.png"));
+        container.add(ghosts.get(3));
 
         container.add(pacman);
 
@@ -169,15 +167,16 @@ public class PacmanGUI extends JFrame {
 
             }
         });
+        Timer.start();
         blinkyThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (!dots.isEmpty()) {
-                    blinky.move();
-                    blinky.setCurrent_target(new int[] {pacman.getRealX(), pacman.getRealY()});
-                    inky.move();
-                    pinky.move();
-                    clyde.move();
+                    for (Ghost ghost : ghosts) {
+                        if (Timer.getTime() >= 6000 && ghost.current_mode != Ghost.CHASEMODE)
+                            ghost.modes(Ghost.CHASEMODE);
+                        ghost.move();
+                    }
                     try {
                         Thread.sleep(5, 5);
                     } catch (InterruptedException ignored) {
@@ -186,12 +185,11 @@ public class PacmanGUI extends JFrame {
             }
         });
         blinkyThread.start();
-        setVisible(true);
+        setVisible(true );
 
     }
 
-    private boolean catched() {
-
+    private boolean caught() {
         return false;
     }
 
