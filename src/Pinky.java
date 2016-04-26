@@ -16,26 +16,29 @@ public class Pinky extends Ghost {
     }
 
     @Override
-    protected void chaseMode() {
-        super.chaseMode();
-        int x = 0;
-        int y = 0;
-        switch (PacmanGUI.pacman.getX_speed()) {
-            case -1:
-                x = - 4 * PacmanGUI.RESOLUTION;
-                break;
-            case 1:
-                x = 4 * PacmanGUI.RESOLUTION;
-                break;
+    protected void calculateTarget() {
+        if (getCurrent_mode() == Ghost.CHASEMODE) {
+            int x = 0;
+            int y = 0;
+            switch (PacmanGUI.pacman.getX_speed()) {
+                case -1:
+                    x = -4 * PacmanGUI.RESOLUTION;
+                    break;
+                case 1:
+                    x = 4 * PacmanGUI.RESOLUTION;
+                    break;
+            }
+            switch (PacmanGUI.pacman.getY_speed()) {
+                case -1:
+                    y = -4 * PacmanGUI.RESOLUTION;
+                    break;
+                case 1:
+                    y = 4 * PacmanGUI.RESOLUTION;
+                    break;
+            }
+            setCurrent_target(new int[]{PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
+        } else {
+            super.calculateTarget();
         }
-        switch (PacmanGUI.pacman.getY_speed()) {
-            case -1:
-                y = - 4 * PacmanGUI.RESOLUTION;
-                break;
-            case 1:
-                y = 4 * PacmanGUI.RESOLUTION;
-                break;
-        }
-        setCurrent_target(new int[] {PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
     }
 }

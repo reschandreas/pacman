@@ -13,8 +13,8 @@ public abstract class Ghost extends Pacman {
     protected static final int SCATTERMODE = 0;
     protected static final int CHASEMODE = 1;
     protected static final int FRIGHTENEDMODE = 2;
-    protected static BufferedImage image_frightened = null;
-    protected static BufferedImage image_normal = null;
+    protected  BufferedImage image_frightened = null;
+    protected  BufferedImage image_normal = null;
 
     private Random random = new Random();
 
@@ -252,8 +252,49 @@ public abstract class Ghost extends Pacman {
 
     @Override
     public void move() {
+        calculateTarget();
         wayChooser();
         super.move();
+    }
+
+    protected void calculateTarget() {
+        setCurrent_target(target);
+    }
+
+    public int getCurrent_mode() {
+        return current_mode;
+    }
+
+    public void setCurrent_mode(int current_mode) {
+        this.current_mode = current_mode;
+    }
+
+    public BufferedImage getImage_frightened() {
+        return image_frightened;
+    }
+
+    public void setImage_frightened(BufferedImage image_frightened) {
+        this.image_frightened = image_frightened;
+    }
+
+    public BufferedImage getImage_normal() {
+        return image_normal;
+    }
+
+    public void setImage_normal(BufferedImage image_normal) {
+        this.image_normal = image_normal;
+    }
+
+    public int getPrev_mode() {
+        return prev_mode;
+    }
+
+    public void setPrev_mode(int prev_mode) {
+        this.prev_mode = prev_mode;
+    }
+
+    public void setTarget(int[] target) {
+        this.target = target;
     }
 
     public int[] getTarget() {

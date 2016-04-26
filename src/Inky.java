@@ -16,32 +16,33 @@ public class Inky extends Ghost {
     }
 
     @Override
-    protected void chaseMode() {
-        super.chaseMode();
-        int targetx = 0;
-        int targety = 0;
-        switch (PacmanGUI.pacman.getX_speed()) {
-            case -1:
-                targetx = - 2 * PacmanGUI.RESOLUTION;
-                break;
-            case 1:
-                targetx = 2 * PacmanGUI.RESOLUTION;
-                break;
+    protected void calculateTarget() {
+        if (getCurrent_mode() == Ghost.CHASEMODE) {
+            int targetx = 0;
+            int targety = 0;
+            switch (PacmanGUI.pacman.getX_speed()) {
+                case -1:
+                    targetx = -2 * PacmanGUI.RESOLUTION;
+                    break;
+                case 1:
+                    targetx = 2 * PacmanGUI.RESOLUTION;
+                    break;
+            }
+            switch (PacmanGUI.pacman.getY_speed()) {
+                case -1:
+                    targety = -2 * PacmanGUI.RESOLUTION;
+                    break;
+                case 1:
+                    targety = 2 * PacmanGUI.RESOLUTION;
+                    break;
+            }
+            targetx += PacmanGUI.pacman.getRealX();
+            targety += PacmanGUI.pacman.getRealY();
+            int x_blinky = PacmanGUI.ghosts.get(0).getRealX();
+            int y_blinky = PacmanGUI.ghosts.get(0).getRealY();
+            setCurrent_target(new int[]{x_blinky + (2 * (targetx - x_blinky)), y_blinky + (2 * (targety - y_blinky))});
+        } else {
+            super.calculateTarget();
         }
-        switch (PacmanGUI.pacman.getY_speed()) {
-            case -1:
-                targety = - 2 * PacmanGUI.RESOLUTION;
-                break;
-            case 1:
-                targety = 2 * PacmanGUI.RESOLUTION;
-                break;
-        }
-        targetx += PacmanGUI.pacman.getRealX();
-        targety += PacmanGUI.pacman.getRealY();
-        int x_blinky = PacmanGUI.ghosts.get(0).getRealX();
-        int y_blinky = PacmanGUI.ghosts.get(0).getRealY();
-        setCurrent_target(new int[] {x_blinky + (2 * (targetx - x_blinky)),y_blinky + (2 * (targety - y_blinky))});
-
     }
-
 }

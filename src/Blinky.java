@@ -19,4 +19,13 @@ public class Blinky extends Ghost {
         super.chaseMode();
         setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
     }
+
+    @Override
+    protected void calculateTarget() {
+        if (getCurrent_mode() == Ghost.CHASEMODE) {
+            setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+        } else {
+            super.calculateTarget();
+        }
+    }
 }

@@ -16,12 +16,15 @@ public class Clyde extends Ghost {
     }
 
     @Override
-    protected void chaseMode() {
-        super.chaseMode();
-        if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION)  {
-            setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+    protected void calculateTarget() {
+        if (getCurrent_mode() == Ghost.CHASEMODE) {
+            if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION) {
+                setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+            } else {
+                setCurrent_target(target);
+            }
         } else {
-            setCurrent_target(target);
+            super.calculateTarget();
         }
     }
 }
