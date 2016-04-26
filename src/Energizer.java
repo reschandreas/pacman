@@ -5,6 +5,6 @@ public class Energizer extends Dot {
 
     public Energizer(String path, int x, int y) {
         super(path, x - 6 , y - 6);
-        points = 100;
+        points = 50;
     }
 }

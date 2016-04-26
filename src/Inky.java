@@ -4,8 +4,8 @@
  */
 public class Inky extends Ghost {
 
-    public Inky(String path) {
-        super(path);
+    public Inky(String path, String frightened) {
+        super(path, frightened);
 /*        startpos[0] = 208;
         startpos[1] = 268;*/
         startpos[0] = 208;
@@ -17,6 +17,7 @@ public class Inky extends Ghost {
 
     @Override
     protected void chaseMode() {
+        super.chaseMode();
         int targetx = 0;
         int targety = 0;
         switch (PacmanGUI.pacman.getX_speed()) {
@@ -37,21 +38,10 @@ public class Inky extends Ghost {
         }
         targetx += PacmanGUI.pacman.getRealX();
         targety += PacmanGUI.pacman.getRealY();
-        int x_blinky = PacmanGUI.ghosts.get(0).getX();
-        int y_blinky = PacmanGUI.ghosts.get(0).getY();
-        int newtargetx = x_blinky + 2 * (targetx - x_blinky);
-        int newtargety = y_blinky + 2 * (targety - y_blinky);
-        setCurrent_target(new int[] {newtargetx, newtargety});
+        int x_blinky = PacmanGUI.ghosts.get(0).getRealX();
+        int y_blinky = PacmanGUI.ghosts.get(0).getRealY();
+        setCurrent_target(new int[] {x_blinky + (2 * (targetx - x_blinky)),y_blinky + (2 * (targety - y_blinky))});
 
     }
 
-    @Override
-    protected void frightenedMode() {
-        super.frightenedMode();
-    }
-
-    @Override
-    protected void scatterMode() {
-        super.scatterMode();
-    }
 }

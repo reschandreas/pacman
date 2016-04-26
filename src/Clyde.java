@@ -4,8 +4,8 @@
  */
 public class Clyde extends Ghost {
 
-    public Clyde(String path) {
-        super(path);
+    public Clyde(String path, String frightened) {
+        super(path, frightened);
 /*        startpos[0] = 176;
         startpos[1] = 268;*/
         startpos[0] = 208;
@@ -17,20 +17,11 @@ public class Clyde extends Ghost {
 
     @Override
     protected void chaseMode() {
+        super.chaseMode();
         if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION)  {
             setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
         } else {
             setCurrent_target(target);
         }
-    }
-
-    @Override
-    protected void frightenedMode() {
-        super.frightenedMode();
-    }
-
-    @Override
-    protected void scatterMode() {
-        super.scatterMode();
     }
 }

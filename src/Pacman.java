@@ -25,8 +25,12 @@ public class Pacman extends Wall {
     private BufferedImage image_down = null;
     private BufferedImage image_next = null;
 
+    private boolean eatable = true;
+
     protected int x_next = 0;
     protected int y_next = 0;
+
+    protected long speed = 5;
 
     public Pacman(String path) {
         super(path);
@@ -55,11 +59,26 @@ public class Pacman extends Wall {
     public void reStart() {
         setLocation(startpos[0], startpos[1]);
         lives = 3;
-        setLocation(startpos[0], startpos[1]);
         points = 0;
         x_speed = x_next = -1;
         y_speed = y_next = 0;
         image = image_next = image_left;
+    }
+
+    public long getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(long speed) {
+        this.speed = speed;
+    }
+
+    public boolean isEatable() {
+        return eatable;
+    }
+
+    public void setEatable(boolean eatable) {
+        this.eatable = eatable;
     }
 
     public int getLives() {

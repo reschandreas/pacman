@@ -3,14 +3,39 @@
  */
 public class Timer {
 
-    private static long startmillis = 0;
+    private long startmillis = 0;
+    private long pausedmillis = 0;
+    private boolean paused = false;
 
-    public static void start() {
+    public Timer() {
+    }
+
+    public void start() {
         startmillis = System.currentTimeMillis();
     }
 
-    public static long getTime() {
+    public long getTime() {
         return (System.currentTimeMillis() - startmillis);
+    }
+
+    public void pause() {
+        paused = true;
+        startmillis = System.currentTimeMillis() - startmillis;
+        pausedmillis = startmillis;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void restart() {
+        paused = false;
+        startmillis = System.currentTimeMillis() - pausedmillis;
+    }
+
+    public void stop() {
+        startmillis = 0;
+        pausedmillis = 0;
     }
 
 }

@@ -57,7 +57,7 @@ public class Wall extends JComponent {
         this.dead = dead;
     }
 
-    public Image getImage() {
+    public BufferedImage getImage() {
         return image;
     }
 

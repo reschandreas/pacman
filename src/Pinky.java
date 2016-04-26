@@ -4,8 +4,8 @@
  */
 public class Pinky extends Ghost {
 
-    public Pinky(String path) {
-        super(path);
+    public Pinky(String path, String frightened) {
+        super(path, frightened);
 /*        startpos[0] = 240;
         startpos[1] = 268;*/
         startpos[0] = 208;
@@ -16,17 +16,8 @@ public class Pinky extends Ghost {
     }
 
     @Override
-    protected void frightenedMode() {
-        super.frightenedMode();
-    }
-
-    @Override
-    protected void scatterMode() {
-        super.scatterMode();
-    }
-
-    @Override
     protected void chaseMode() {
+        super.chaseMode();
         int x = 0;
         int y = 0;
         switch (PacmanGUI.pacman.getX_speed()) {

@@ -4,8 +4,8 @@
  */
 public class Blinky extends Ghost {
 
-    public Blinky(String path) {
-        super(path);
+    public Blinky(String path, String frightened) {
+        super(path, frightened);
         startpos[0] = 208;
         startpos[1] = 216;
         setLocation(startpos[0], startpos[1]);
@@ -13,18 +13,10 @@ public class Blinky extends Ghost {
         target[1] = current_target[1] = 0;
     }
 
+
     @Override
     protected void chaseMode() {
+        super.chaseMode();
         setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
-    }
-
-    @Override
-    protected void frightenedMode() {
-        super.frightenedMode();
-    }
-
-    @Override
-    protected void scatterMode() {
-        setCurrent_target(getTarget());
     }
 }
