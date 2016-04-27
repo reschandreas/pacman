@@ -1,3 +1,7 @@
+package net.gobbz.spielobjekte;
+
+import programm.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Red Ghost
@@ -22,7 +26,7 @@ public class Blinky extends Ghost {
 
     @Override
     protected void calculateTarget() {
-        if (getCurrent_mode() == Ghost.CHASEMODE) {
+        if (getCurrent_mode() == CHASEMODE) {
             setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
         } else {
             super.calculateTarget();

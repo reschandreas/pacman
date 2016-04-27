@@ -1,3 +1,5 @@
+package net.gobbz.spielobjekte;
+
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;

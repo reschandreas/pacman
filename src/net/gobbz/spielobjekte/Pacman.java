@@ -1,3 +1,9 @@
+package net.gobbz.spielobjekte;
+
+import net.gobbz.grundobjekte.Wall;
+
+import net.gobbz.grundobjekte.*;
+import programm.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -5,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -19,11 +26,11 @@ public class Pacman extends Wall {
 
     protected int[] startpos = new int[2];
 
-    private BufferedImage image_right = null;
-    private BufferedImage image_left = null;
-    private BufferedImage image_up = null;
-    private BufferedImage image_down = null;
-    private BufferedImage image_next = null;
+    private Image image_right = null;
+    private Image image_left = null;
+    private Image image_up = null;
+    private Image image_down = null;
+    private Image image_next = null;
 
     private boolean eatable = true;
 
@@ -44,7 +51,7 @@ public class Pacman extends Wall {
 
     public Pacman(String up, String down, String left, String right) {
         this(left);
-        try {
+/*        try {
             image_left = ImageIO.read(new File(getClass().getResource(left).toURI()));
             image_next = image_left;
             image_right = ImageIO.read(new File(getClass().getResource(right).toURI()));
@@ -52,8 +59,76 @@ public class Pacman extends Wall {
             image_down = ImageIO.read(new File(getClass().getResource(down).toURI()));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-        }
+        }*/
 
+        URL url = this.getClass().getResource(up);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_up = getToolkit().getImage(url);
+            prepareImage(image_up, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_up, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        url = this.getClass().getResource(down);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_down = getToolkit().getImage(url);
+            prepareImage(image_down, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_down, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        url = this.getClass().getResource(left);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_left = getToolkit().getImage(url);
+            prepareImage(image_left, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_left, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        url = this.getClass().getResource(right);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_right = getToolkit().getImage(url);
+            prepareImage(image_right, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_right, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void reStart() {
@@ -99,7 +174,7 @@ public class Pacman extends Wall {
             if (image_left != null)
                 image_next = image_left;
         } else if (image_right != null)
-                image_next = image_right;
+            image_next = image_right;
         y_next = 0;
     }
 
@@ -121,7 +196,7 @@ public class Pacman extends Wall {
             if (image_up != null)
                 image_next = image_up;
         } else if (image_down != null)
-                image_next = image_down;
+            image_next = image_down;
         x_next = 0;
     }
 
@@ -202,30 +277,30 @@ public class Pacman extends Wall {
     }
 
     /**
-     * Kontrolliert ob das Objekt - verschoben zur Ã¼bergebenen x- und y-Position - mit
+     * Kontrolliert ob das Objekt - verschoben zur ÃƒÂ¼bergebenen x- und y-Position - mit
      * einem anderen Objekt kollidiert. Ist das der Fall, so wird das andere kollidierende
-     * Objekt zurÃ¼ck geliefert.<br>
-     * Es wird ebenfalls der contentPane des Formulars zurÃ¼ck geliefert, falls das Objekt
-     * auÃŸerhalb des Formulars positioniert werden sollte, d. h. Ã¼ber den Rand des
-     * Formulars hinaus ragen wÃ¼rde
+     * Objekt zurÃƒÂ¼ck geliefert.<br>
+     * Es wird ebenfalls der contentPane des Formulars zurÃƒÂ¼ck geliefert, falls das Objekt
+     * auÃƒÅ¸erhalb des Formulars positioniert werden sollte, d. h. ÃƒÂ¼ber den Rand des
+     * Formulars hinaus ragen wÃƒÂ¼rde
      *
      * @param x die zu kontrollierende x-Koordinate
      * @param y die zu kontrollierende y-Koordinate
      * @return das Objekt das mit dem Objekt kollidiert oder - falls das Objekt an der
-     * Ã¼bergebenen Position auÃŸerhalb des Frames positioniert wird - wird der contentPane
-     * zurÃ¼ck geliefert. Liefert null zurÃ¼ck, falls das Objekt ohne Ãœberdeckung an der
-     * Ã¼bergebenen Position positioniert werden kann
+     * ÃƒÂ¼bergebenen Position auÃƒÅ¸erhalb des Frames positioniert wird - wird der contentPane
+     * zurÃƒÂ¼ck geliefert. Liefert null zurÃƒÂ¼ck, falls das Objekt ohne ÃƒÅ“berdeckung an der
+     * ÃƒÂ¼bergebenen Position positioniert werden kann
      */
     public Component getObjektBei(int x, int y) {
         Component ret = null;
         if (this.getParent() != null) {
-            // Kontrolliere ob neue Position auÃŸerhalb des Frames liegt
+            // Kontrolliere ob neue Position auÃƒÅ¸erhalb des Frames liegt
             if (x < 0 || y < 0 || x + this.getWidth() > this.getParent().getWidth() ||
                     y + this.getHeight() > this.getParent().getHeight())
-                // In diesem Fall wird der contentPane des Formulars Ã¼bergeben
+                // In diesem Fall wird der contentPane des Formulars ÃƒÂ¼bergeben
                 ret = this.getParent();
             else {
-                // Kontrolliere ob sich die neue Position mit anderen Objekten Ã¼berdeckt
+                // Kontrolliere ob sich die neue Position mit anderen Objekten ÃƒÂ¼berdeckt
                 Rectangle neuePosition =
                         new Rectangle(x, y, this.getWidth(), this.getHeight());
                 // Gehe alle Objekte des Formulars durch und vergleiche ihre Position mit der
@@ -234,7 +309,7 @@ public class Pacman extends Wall {
                 int i = 0;
                 while (komponenten != null && i < komponenten.length && ret == null) {
                     // Wenn das Objekt nicht das zu kontrollierende Objekt ist und das Objekt
-                    // mit dem zu Kontrollierendem zusammenfällt
+                    // mit dem zu Kontrollierendem zusammenfÃ¤llt
                     if (komponenten[i] != this && neuePosition.intersects(komponenten[i].getBounds()) && !(komponenten[i] instanceof Pacman))
                         ret = komponenten[i];
                     i++;

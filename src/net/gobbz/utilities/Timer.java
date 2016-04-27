@@ -1,3 +1,5 @@
+package net.gobbz.utilities;
+
 /**
  * Created by Andreas on 21.04.16.
  */

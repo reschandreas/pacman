@@ -1,3 +1,7 @@
+package net.gobbz.spielobjekte;
+
+import programm.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Blue Ghost
@@ -17,7 +21,7 @@ public class Inky extends Ghost {
 
     @Override
     protected void calculateTarget() {
-        if (getCurrent_mode() == Ghost.CHASEMODE) {
+        if (getCurrent_mode() == CHASEMODE) {
             int targetx = 0;
             int targety = 0;
             switch (PacmanGUI.pacman.getX_speed()) {

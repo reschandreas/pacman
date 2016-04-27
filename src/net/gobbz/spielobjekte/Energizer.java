@@ -1,3 +1,5 @@
+package net.gobbz.spielobjekte;
+
 /**
  * Created by Andreas on 16.04.16.
  */

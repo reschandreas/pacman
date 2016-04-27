@@ -1,3 +1,7 @@
+package net.gobbz.grundobjekte;
+
+
+import programm.*;
 import javax.swing.*;
 import java.awt.*;
 

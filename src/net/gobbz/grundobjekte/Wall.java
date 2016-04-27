@@ -1,3 +1,5 @@
+package net.gobbz.grundobjekte;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +14,14 @@ import java.net.URL;
  */
 public class Wall extends JComponent {
 
-    protected BufferedImage image = null;
+    protected Image image = null;
     protected String image_path = null;
 
     protected boolean dead = false;
 
     public Wall(String path) {
         image_path = path;
+/*
         try {
             image = ImageIO.read(new File(getClass().getResource(path).toURI()));
         } catch (IOException | URISyntaxException e) {
@@ -26,6 +29,28 @@ public class Wall extends JComponent {
         }
         // Stelle Größe des Objektes auf Größe des Bildes ein
         this.setSize(this.image.getWidth(this), this.image.getHeight(this));
+*/
+
+        URL url = this.getClass().getResource(path);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image = getToolkit().getImage(url);
+            prepareImage(image, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                }
+                catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Stelle Größe des Objektes auf Größe des Bildes ein
+            this.setSize(this.image.getWidth(this),this.image.getHeight(this));
+        }
     }
     /**
      * Methode, welche automatisch aufgerufen wird und das Bild in der Größe des Objektes
@@ -57,11 +82,11 @@ public class Wall extends JComponent {
         this.dead = dead;
     }
 
-    public BufferedImage getImage() {
+    public Image getImage() {
         return image;
     }
 
-    public void setImage(BufferedImage image) {
+    public void setImage(Image image) {
         this.image = image;
     }
 

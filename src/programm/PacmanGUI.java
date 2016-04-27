@@ -1,3 +1,9 @@
+package programm;
+
+import net.gobbz.grundobjekte.*;
+import net.gobbz.spielobjekte.*;
+import net.gobbz.utilities.Timer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -18,8 +24,6 @@ public class PacmanGUI extends JFrame {
     public final int WIDTH = 28 * RESOLUTION;
     public final int HEIGHT = 36 * RESOLUTION;
 
-    private Random random = new Random();
-
     List<List<Integer>> wavelist = new ArrayList<>();
     List<List<Double>> speedlist = new ArrayList<>();
 
@@ -28,15 +32,10 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
     public static ArrayList<Ghost> ghosts = new ArrayList<>();
-    static final public Pacman pacman = new Pacman("images/pacman_up.png", "images/pacman_down.png", "images/pacman_left.png", "images/pacman_right.png");
+    static final public Pacman pacman = new Pacman("pacman_up.png", "pacman_down.png", "pacman_left.png", "pacman_right.png");
 
     private Thread moveThread;
     private Thread ghostThread;
-
-    private Blinky blinky;
-    private Inky inky;
-    private Pinky pinky;
-    private Clyde clyde;
 
     private Container container;
 
@@ -49,8 +48,6 @@ public class PacmanGUI extends JFrame {
 
     private Timer wavetimer = new Timer();
     private Timer frigthenedtimer = new Timer();
-
-    private final int FRAMERATE = 3;
 
     public PacmanGUI() {
         super("Pacman");
@@ -99,16 +96,16 @@ public class PacmanGUI extends JFrame {
         }
         window.dispose();
 
-        ghosts.add(new Blinky("images/ghost_red.png", "images/ghost_frightened.png"));
+        ghosts.add(new Blinky("ghost_red.png", "ghost_frightened.png"));
         container.add(ghosts.get(0));
 
-        ghosts.add(new Inky("images/ghost_blue.png", "images/ghost_frightened.png"));
+        ghosts.add(new Inky("ghost_blue.png", "ghost_frightened.png"));
         container.add(ghosts.get(1));
 
-        ghosts.add(new Pinky("images/ghost_pink.png", "images/ghost_frightened.png"));
+        ghosts.add(new Pinky("ghost_pink.png", "ghost_frightened.png"));
         container.add(ghosts.get(2));
 
-        ghosts.add(new Clyde("images/ghost_orange.png", "images/ghost_frightened.png"));
+        ghosts.add(new Clyde("ghost_orange.png", "ghost_frightened.png"));
         container.add(ghosts.get(3));
 
         container.add(pacman);
@@ -183,9 +180,9 @@ public class PacmanGUI extends JFrame {
                         if (!eaten) {
                             row = 0;
                         } else row = 1;
-                        if (!eaten && ghosts.get(0).current_mode == Ghost.FRIGHTENEDMODE)
+                        if (!eaten && ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
                             row = 2;
-                        if (eaten && ghosts.get(0).current_mode == Ghost.FRIGHTENEDMODE)
+                        if (eaten && ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
                             row = 3;
                         double tempspeed;
                         switch (level) {
@@ -205,6 +202,7 @@ public class PacmanGUI extends JFrame {
                         long speedms = (long) tempspeed;
                         double temp = (tempspeed - speedms) * 1000;
                         int speedns = (int) temp;
+                        System.out.println("Pacman: " + speedms + " " + speedns);
                         try {
                             Thread.sleep(speedms, speedns);
                         } catch (InterruptedException ignored) {
@@ -248,7 +246,7 @@ public class PacmanGUI extends JFrame {
         ghostThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!dots.isEmpty()) {
+                while (!dots.isEmpty() && !caught()) {
                     int row = 4;
                     double tempspeed = 0;
                     long speedms = 0;
@@ -258,7 +256,7 @@ public class PacmanGUI extends JFrame {
                         ghost.move();
                     }
 
-                    if (ghosts.get(0).current_mode == Ghost.FRIGHTENEDMODE)
+                    if (ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
                         row = 5;
                     else row = 4;
                     switch (level) {
@@ -278,6 +276,7 @@ public class PacmanGUI extends JFrame {
                     speedms = (long) tempspeed;
                     temp = (tempspeed - speedms) * 1000;
                     speedns = (int) temp;
+                    System.out.println("Ghost: " + speedms + " " + speedns);
                     try {
                         Thread.sleep(speedms, speedns);
                     } catch (InterruptedException ignored) {
@@ -293,9 +292,13 @@ public class PacmanGUI extends JFrame {
     }
 
 
-
     private boolean caught() {
         for (Ghost ghost : ghosts) {
+            if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY())
+                if (ghost.isEatable())
+                    ghost.reStart();
+                else
+                    return true;
         }
 
         return false;
@@ -322,13 +325,13 @@ public class PacmanGUI extends JFrame {
                         if (dots.get(i) instanceof Energizer) {
                             wavetimer.pause();
                             for (Ghost ghost : ghosts) {
-                                if (ghost.current_mode != Ghost.FRIGHTENEDMODE)
+                                if (ghost.getCurrent_mode() != Ghost.FRIGHTENEDMODE)
                                     ghost.modes(Ghost.FRIGHTENEDMODE);
                             }
                             frigthenedtimer.start();
                         }
                         dots.get(i).die();
-                        pacman.setPoints(pacman.getPoints() + dots.get(i).points);
+                        pacman.setPoints(pacman.getPoints() + dots.get(i).getPoints());
                         l_score.setText(String.valueOf(pacman.getPoints()));
                         dots.remove(i);
                         container.repaint();
@@ -343,7 +346,7 @@ public class PacmanGUI extends JFrame {
     private void readDatas() {
         int i = 0;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("waves.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("programm/waves.txt"));
             while (true) {
                 String line = reader.readLine();
                 if (line == null || line.isEmpty())
@@ -365,7 +368,7 @@ public class PacmanGUI extends JFrame {
         }
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("speeds.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("src/speeds.txt"));
             while (true) {
                 String line = reader.readLine();
                 if (line == null || line.isEmpty())
@@ -391,7 +394,7 @@ public class PacmanGUI extends JFrame {
         if (walls.isEmpty()) {
             //Zeichne Mauern aus der Datei maze.txt
             try {
-                BufferedReader reader = new BufferedReader(new FileReader("maze.txt"));
+                BufferedReader reader = new BufferedReader(new FileReader("src/maze.txt"));
                 while (true) {
                     String line = reader.readLine();
                     if (line == null || line.isEmpty())
@@ -414,7 +417,7 @@ public class PacmanGUI extends JFrame {
         }
         if (intersections.isEmpty()) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader("intersections.txt"));
+                BufferedReader reader = new BufferedReader(new FileReader("src/intersections.txt"));
                 while (true) {
                     String line = reader.readLine();
                     if (line == null || line.isEmpty())
@@ -436,7 +439,7 @@ public class PacmanGUI extends JFrame {
 
         if (dots.isEmpty()) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader("dots.txt"));
+                BufferedReader reader = new BufferedReader(new FileReader("src/dots.txt"));
                 while (true) {
                     String line = reader.readLine();
                     if (line == null || line.isEmpty())
@@ -445,7 +448,7 @@ public class PacmanGUI extends JFrame {
                     else {
                         String[] strings = line.split(";");
                         Dot dot;
-                        if (strings[0].equals("images/energizer.png")) {
+                        if (strings[0].equals("energizer.png")) {
                             dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
                         } else
                             dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));

@@ -1,7 +1,12 @@
+package net.gobbz.spielobjekte;
+
+import net.gobbz.grundobjekte.*;
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,11 +15,11 @@ import java.util.Random;
  */
 public abstract class Ghost extends Pacman {
 
-    protected static final int SCATTERMODE = 0;
-    protected static final int CHASEMODE = 1;
-    protected static final int FRIGHTENEDMODE = 2;
-    protected  BufferedImage image_frightened = null;
-    protected  BufferedImage image_normal = null;
+    public static final int SCATTERMODE = 0;
+    public static final int CHASEMODE = 1;
+    public static final int FRIGHTENEDMODE = 2;
+    protected Image image_frightened = null;
+    protected Image image_normal = null;
 
     private Random random = new Random();
 
@@ -34,11 +39,45 @@ public abstract class Ghost extends Pacman {
 
     public Ghost(String path, String frightened) {
         this(path);
-        try {
+/*        try {
             image_normal = ImageIO.read(new File(getClass().getResource(path).toURI()));
             image_frightened = ImageIO.read(new File(getClass().getResource(frightened).toURI()));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
+        }*/
+        URL url = this.getClass().getResource(path);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_normal = getToolkit().getImage(url);
+            prepareImage(image_normal, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_normal, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        url = this.getClass().getResource(frightened);
+        if (url == null)
+            System.out.println("Datei nicht gefunden");
+        else {
+            this.image_frightened = getToolkit().getImage(url);
+            prepareImage(image_frightened, this);
+            Thread t = Thread.currentThread();
+            // Warte bis die Eigenschaften des Bildes geladen sind
+            while ((checkImage(image_frightened, this) & PROPERTIES) != PROPERTIES) {
+                try {
+                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -269,19 +308,19 @@ public abstract class Ghost extends Pacman {
         this.current_mode = current_mode;
     }
 
-    public BufferedImage getImage_frightened() {
+    public Image getImage_frightened() {
         return image_frightened;
     }
 
-    public void setImage_frightened(BufferedImage image_frightened) {
+    public void setImage_frightened(Image image_frightened) {
         this.image_frightened = image_frightened;
     }
 
-    public BufferedImage getImage_normal() {
+    public Image getImage_normal() {
         return image_normal;
     }
 
-    public void setImage_normal(BufferedImage image_normal) {
+    public void setImage_normal(Image image_normal) {
         this.image_normal = image_normal;
     }
 
@@ -313,7 +352,7 @@ public abstract class Ghost extends Pacman {
         return (int) Math.sqrt((Math.pow(targetx - startx, 2) + Math.pow(targety - starty, 2)));
     }
 
-    protected void modes(int mode) {
+    public void modes(int mode) {
         prev_mode = current_mode;
         switch (mode) {
             case SCATTERMODE:

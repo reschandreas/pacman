@@ -1,3 +1,6 @@
+package net.gobbz.spielobjekte;
+
+import programm.*;
 /**
  * Created by Andreas on 09.04.16.
  * Orange Ghost
@@ -17,7 +20,7 @@ public class Clyde extends Ghost {
 
     @Override
     protected void calculateTarget() {
-        if (getCurrent_mode() == Ghost.CHASEMODE) {
+        if (getCurrent_mode() == CHASEMODE) {
             if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION) {
                 setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
             } else {

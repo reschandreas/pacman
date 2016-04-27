@@ -1,3 +1,6 @@
+package net.gobbz.spielobjekte;
+
+import programm.*;
 /**
  * Created by Andreas on 09.04.16.
  * Pink Ghost
@@ -17,7 +20,7 @@ public class Pinky extends Ghost {
 
     @Override
     protected void calculateTarget() {
-        if (getCurrent_mode() == Ghost.CHASEMODE) {
+        if (getCurrent_mode() == CHASEMODE) {
             int x = 0;
             int y = 0;
             switch (PacmanGUI.pacman.getX_speed()) {
