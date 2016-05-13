@@ -32,6 +32,8 @@ public abstract class Ghost extends Pacman {
 
     public Ghost(String path) {
         super(path);
+        speed = 7;
+        setEatable(false);
         current_target[0] = target[0];
         current_target[1] = target[1];
         current_mode = SCATTERMODE;
@@ -39,12 +41,6 @@ public abstract class Ghost extends Pacman {
 
     public Ghost(String path, String frightened) {
         this(path);
-/*        try {
-            image_normal = ImageIO.read(new File(getClass().getResource(path).toURI()));
-            image_frightened = ImageIO.read(new File(getClass().getResource(frightened).toURI()));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }*/
         URL url = this.getClass().getResource(path);
         if (url == null)
             System.out.println("Datei nicht gefunden");

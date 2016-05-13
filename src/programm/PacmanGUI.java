@@ -2,7 +2,7 @@ package programm;
 
 import net.gobbz.grundobjekte.*;
 import net.gobbz.spielobjekte.*;
-import net.gobbz.utilities.Timer;
+import sun.plugin.javascript.navig.Array;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,9 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.*;
+import java.awt.geom.Arc2D;
+import java.sql.Time;
 import java.util.*;
 import java.util.List;
+import java.util.Timer;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -25,7 +27,7 @@ public class PacmanGUI extends JFrame {
     public final int HEIGHT = 36 * RESOLUTION;
 
     List<List<Integer>> wavelist = new ArrayList<>();
-    List<List<Double>> speedlist = new ArrayList<>();
+    double speedlist[][] = new double[4][7];
 
     private ArrayList<Wall> walls = new ArrayList<>();
     public static ArrayList<Intersection> intersections = new ArrayList<>();
@@ -44,10 +46,10 @@ public class PacmanGUI extends JFrame {
 
     private JLabel l_leveltext;
     private JLabel l_level;
-    private int level = 1;
+    private int level = 0;
 
-    private Timer wavetimer = new Timer();
-    private Timer frigthenedtimer = new Timer();
+    private Timer wavetimer = null;
+    private Timer modestimer = null;
 
     public PacmanGUI() {
         super("Pacman");
@@ -71,6 +73,8 @@ public class PacmanGUI extends JFrame {
 
         drawMaze();
 
+        wavetimer = new Timer();
+
         l_scoretext = new JLabel("Score: ");
         l_scoretext.setBounds(0, 30, 50, 20);
         l_scoretext.setForeground(Color.white);
@@ -83,10 +87,12 @@ public class PacmanGUI extends JFrame {
 
         l_leveltext = new JLabel("Level: ");
         l_leveltext.setBounds(0, 15, 50, 20);
+        l_leveltext.setForeground(Color.white);
         container.add(l_leveltext);
 
         l_level = new JLabel(String.valueOf(level));
         l_level.setBounds(50, 15, 40, 20);
+        l_level.setForeground(Color.white);
         container.add(l_level);
 
         try {
@@ -118,6 +124,10 @@ public class PacmanGUI extends JFrame {
                            @Override
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
+                                   case KeyEvent.VK_M: {
+                                       System.out.println(getMousePosition().getX() + " " + getMousePosition().getY());
+                                       break;
+                                   }
                                    case KeyEvent.VK_P: {
                                        for (Tile tile : tiles) {
                                            tile.setVisible(!tile.isVisible());
@@ -187,30 +197,38 @@ public class PacmanGUI extends JFrame {
                         double tempspeed;
                         switch (level) {
                             case 1:
-                                tempspeed = (pacman.getSpeed() * speedlist.get(0).get(row));
+                                tempspeed = (pacman.getSpeed() * speedlist[0][row]);
                                 break;
                             case 2 - 4:
-                                tempspeed = (pacman.getSpeed() * speedlist.get(1).get(row));
+                                tempspeed = (pacman.getSpeed() * speedlist[1][row]);
                                 break;
                             case 5 - 20:
-                                tempspeed = (pacman.getSpeed() * speedlist.get(2).get(row));
+                                tempspeed = (pacman.getSpeed() * speedlist[2][row]);
                                 break;
                             default:
-                                tempspeed = (pacman.getSpeed() * speedlist.get(3).get(row));
+                                tempspeed = (pacman.getSpeed() * speedlist[3][row]);
                                 break;
                         }
                         long speedms = (long) tempspeed;
                         double temp = (tempspeed - speedms) * 1000;
                         int speedns = (int) temp;
-                        System.out.println("Pacman: " + speedms + " " + speedns);
                         try {
                             Thread.sleep(speedms, speedns);
                         } catch (InterruptedException ignored) {
                         }
                     }
-                    newGame();
+                    if (dots.isEmpty())
+                        nextLevel();
+                    else {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        continueLevel();
+                    }
                     drawMaze();
-                } while (true);
+                } while (pacman.getLives() != 0);
             }
         });
         moveThread.start();
@@ -242,7 +260,6 @@ public class PacmanGUI extends JFrame {
             }
         });
 
-        wavetimer.start();
         ghostThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -254,29 +271,26 @@ public class PacmanGUI extends JFrame {
                     int speedns = 0;
                     for (Ghost ghost : ghosts) {
                         ghost.move();
+                        if (ghost.getCurrent_mode() == Ghost.FRIGHTENEDMODE)
+                            row = 5;
                     }
-
-                    if (ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
-                        row = 5;
-                    else row = 4;
                     switch (level) {
                         case 1:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist.get(0).get(row));
+                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[0][row]);
                             break;
                         case 2 - 4:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist.get(1).get(row));
+                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[1][row]);
                             break;
                         case 5 - 20:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist.get(2).get(row));
+                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[2][row]);
                             break;
                         default:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist.get(3).get(row));
+                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[3][row]);
                             break;
                     }
                     speedms = (long) tempspeed;
                     temp = (tempspeed - speedms) * 1000;
                     speedns = (int) temp;
-                    System.out.println("Ghost: " + speedms + " " + speedns);
                     try {
                         Thread.sleep(speedms, speedns);
                     } catch (InterruptedException ignored) {
@@ -287,10 +301,16 @@ public class PacmanGUI extends JFrame {
 
         );
         ghostThread.start();
-
+        newGame();
         setVisible(true);
     }
 
+    private void continueLevel() {
+        for (Ghost ghost : ghosts) {
+            ghost.reStart();
+        }
+        pacman.reStart();
+    }
 
     private boolean caught() {
         for (Ghost ghost : ghosts) {
@@ -300,18 +320,73 @@ public class PacmanGUI extends JFrame {
                 else
                     return true;
         }
-
         return false;
     }
 
-    private void newGame() {
-        wavetimer.start();
+    private void nextLevel() {
+        level++;
+        for (Ghost ghost : ghosts) {
+            ghost.setCurrent_mode(Ghost.SCATTERMODE);
+        }
+        switch (level) {
+            case 1: {
+                for (final Ghost ghost : ghosts) {
+                    wavetimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            ghost.setCurrent_mode(Ghost.CHASEMODE);
+                            wavetimer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ghost.setCurrent_mode(Ghost.SCATTERMODE);
+                                    wavetimer.schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            ghost.setCurrent_mode(Ghost.CHASEMODE);
+                                            wavetimer.schedule(new TimerTask() {
+                                                @Override
+                                                public void run() {
+                                                    ghost.setCurrent_mode(Ghost.SCATTERMODE);
+                                                    wavetimer.schedule(new TimerTask() {
+                                                        @Override
+                                                        public void run() {
+                                                            ghost.setCurrent_mode(Ghost.CHASEMODE);
+                                                            wavetimer.schedule(new TimerTask() {
+                                                                @Override
+                                                                public void run() {
+                                                                    ghost.setCurrent_mode(Ghost.SCATTERMODE);
+                                                                    wavetimer.schedule(new TimerTask() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            ghost.setCurrent_mode(Ghost.CHASEMODE);
+                                                                        }
+                                                                    }, (long) wavelist.get(0).get(6) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(6));
+                                                                }
+                                                            }, (long) wavelist.get(0).get(5) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(5));
+                                                        }
+                                                    }, (long) wavelist.get(0).get(4) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(4));
+                                                }
+                                            }, (long) wavelist.get(0).get(3) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(3));
+                                        }
+                                    }, (long) wavelist.get(0).get(2) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(2));
+                                }
+                            }, (long) wavelist.get(0).get(1) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(1));
+                        }
+                    }, (long) wavelist.get(0).get(0) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(0));
+                }
+            }
+        }
         pacman.reStart();
         for (Ghost ghost : ghosts) {
             ghost.reStart();
         }
+    }
 
-
+    private void newGame() {
+        level = 0;
+        pacman.setPoints(0);
+        pacman.setLives(3);
+        nextLevel();
     }
 
     private boolean eatenDots() {
@@ -323,12 +398,10 @@ public class PacmanGUI extends JFrame {
                     if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
                             || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
                         if (dots.get(i) instanceof Energizer) {
-                            wavetimer.pause();
                             for (Ghost ghost : ghosts) {
                                 if (ghost.getCurrent_mode() != Ghost.FRIGHTENEDMODE)
                                     ghost.modes(Ghost.FRIGHTENEDMODE);
                             }
-                            frigthenedtimer.start();
                         }
                         dots.get(i).die();
                         pacman.setPoints(pacman.getPoints() + dots.get(i).getPoints());
@@ -345,124 +418,96 @@ public class PacmanGUI extends JFrame {
 
     private void readDatas() {
         int i = 0;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("programm/waves.txt"));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || line.isEmpty())
-                    // Dateiende erkannt
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    wavelist.add(new ArrayList<Integer>());
-                    wavelist.get(i).addAll(Arrays.asList(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]),
-                            Integer.parseInt(strings[2]), Integer.parseInt(strings[3]), Integer.parseInt(strings[4]),
-                            Integer.parseInt(strings[5]), Integer.parseInt(strings[6]), Integer.parseInt(strings[7])));
-                }
+        Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("waves.data")).useDelimiter("\\n");
+        while (true) {
+            String line = reader.hasNext() ? reader.next() : "";
+            if (line == null || line.isEmpty())
+                // Dateiende erkannt
+                break;
+            else {
+                String[] strings = line.split(";");
+                wavelist.add(new ArrayList<Integer>());
+                wavelist.get(i).addAll(Arrays.asList(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]),
+                        Integer.parseInt(strings[2]), Integer.parseInt(strings[3]), Integer.parseInt(strings[4]),
+                        Integer.parseInt(strings[5]), Integer.parseInt(strings[6]), Integer.parseInt(strings[7])));
             }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("waves.txt not found");
-        } catch (IOException e) {
-            System.out.println("Error happened");
         }
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("src/speeds.txt"));
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || line.isEmpty())
-                    // Dateiende erkannt
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    speedlist.add(new ArrayList<Double>());
-                    speedlist.get(i).addAll(Arrays.asList(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]),
-                            Double.parseDouble(strings[2]), Double.parseDouble(strings[3]), Double.parseDouble(strings[4]),
-                            Double.parseDouble(strings[5]), Double.parseDouble(strings[6])));
+        reader = new Scanner(PacmanGUI.class.getResourceAsStream("speeds.data")).useDelimiter("\\n");
+        i = 0;
+        while (true) {
+            String line = reader.hasNext() ? reader.next() : "";
+            if (line == null || line.isEmpty())
+                // Dateiende erkannt
+                break;
+            else {
+                String[] strings = line.split(";");
+                int j = 0;
+                for (String s : strings) {
+                    speedlist[i][j] = Double.parseDouble(s);
+                    System.out.println("i: " + i + " j: " + j);
+                    j++;
                 }
+                i++;
             }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("speeds.txt not found");
-        } catch (IOException e) {
-            System.out.println("Error happened");
         }
     }
 
     private void drawMaze() {
         if (walls.isEmpty()) {
-            //Zeichne Mauern aus der Datei maze.txt
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader("src/maze.txt"));
-                while (true) {
-                    String line = reader.readLine();
-                    if (line == null || line.isEmpty())
-                        // Dateiende erkannt
-                        break;
-                    else {
-                        String[] strings = line.split(";");
-                        Wall wall = new Wall(strings[0]);
-                        wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
-                        container.add(wall);
-                        walls.add(wall);
-                    }
+            //Zeichne Mauern aus der Datei maze.data*/
+            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("maze.data")).useDelimiter("\\n");
+            while (true) {
+                String line = reader.hasNext() ? reader.next() : "";
+                if (line == null || line.isEmpty())
+                    // Dateiende erkannt
+                    break;
+                else {
+                    String[] strings = line.split(";");
+                    Wall wall = new Wall(strings[0]);
+                    wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
+                    container.add(wall);
+                    walls.add(wall);
                 }
-                reader.close();
-            } catch (FileNotFoundException e) {
-                System.out.println("maze.txt not found");
-            } catch (IOException e) {
-                System.out.println("Error happened");
             }
+            reader.close();
         }
         if (intersections.isEmpty()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader("src/intersections.txt"));
-                while (true) {
-                    String line = reader.readLine();
-                    if (line == null || line.isEmpty())
-                        break;
-                    else {
-                        String[] strings = line.split(";");
-                        Intersection intersection = new Intersection(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), Boolean.parseBoolean(strings[2]),
-                                Boolean.parseBoolean(strings[3]), Boolean.parseBoolean(strings[4]), Boolean.parseBoolean(strings[5]));
-                        container.add(intersection);
-                        intersections.add(intersection);
-                    }
+            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("intersections.data")).useDelimiter("\\n");
+            while (true) {
+                String line = reader.hasNext() ? reader.next() : "";
+                if (line == null || line.isEmpty())
+                    break;
+                else {
+                    String[] strings = line.split(";");
+                    Intersection intersection = new Intersection(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]), Boolean.parseBoolean(strings[2]),
+                            Boolean.parseBoolean(strings[3]), Boolean.parseBoolean(strings[4]), Boolean.parseBoolean(strings[5]));
+                    container.add(intersection);
+                    intersections.add(intersection);
                 }
-            } catch (FileNotFoundException e) {
-                System.out.println("intersections.txt not found");
-            } catch (IOException e) {
-                System.out.println("Error happened");
             }
+            reader.close();
         }
 
         if (dots.isEmpty()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader("src/dots.txt"));
-                while (true) {
-                    String line = reader.readLine();
-                    if (line == null || line.isEmpty())
-                        // Dateiende erkannt
-                        break;
-                    else {
-                        String[] strings = line.split(";");
-                        Dot dot;
-                        if (strings[0].equals("energizer.png")) {
-                            dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
-                        } else
-                            dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
-                        container.add(dot);
-                        dots.add(dot);
-                    }
+            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("dots.data")).useDelimiter("\\n");
+            while (true) {
+                String line = reader.hasNext() ? reader.next() : "";
+                if (line == null || line.isEmpty())
+                    // Dateiende erkannt
+                    break;
+                else {
+                    String[] strings = line.split(";");
+                    Dot dot;
+                    if (strings[0].equals("energizer.png")) {
+                        dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                    } else
+                        dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                    container.add(dot);
+                    dots.add(dot);
                 }
-                reader.close();
-                System.out.println(dots.size());
-            } catch (FileNotFoundException e) {
-                System.out.println("dots.txt not found");
-            } catch (IOException e) {
-                System.out.println("Error happened");
             }
+            reader.close();
         }
 
         if (tiles.isEmpty()) {

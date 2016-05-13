@@ -41,6 +41,7 @@ public class Pacman extends Wall {
 
     public Pacman(String path) {
         super(path);
+        setEatable(true);
         startpos[0] = 208;
         startpos[1] = 408;
         setLocation(startpos[0], startpos[1]);
@@ -51,16 +52,6 @@ public class Pacman extends Wall {
 
     public Pacman(String up, String down, String left, String right) {
         this(left);
-/*        try {
-            image_left = ImageIO.read(new File(getClass().getResource(left).toURI()));
-            image_next = image_left;
-            image_right = ImageIO.read(new File(getClass().getResource(right).toURI()));
-            image_up = ImageIO.read(new File(getClass().getResource(up).toURI()));
-            image_down = ImageIO.read(new File(getClass().getResource(down).toURI()));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }*/
-
         URL url = this.getClass().getResource(up);
         if (url == null)
             System.out.println("Datei nicht gefunden");
