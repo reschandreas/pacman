@@ -10,6 +10,7 @@ public class Blinky extends Ghost {
 
     public Blinky(String path, String frightened) {
         super(path, frightened);
+        insidehouse = false;
         startpos[0] = 208;
         startpos[1] = 216;
         setLocation(startpos[0], startpos[1]);

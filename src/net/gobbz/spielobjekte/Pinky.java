@@ -1,6 +1,7 @@
 package net.gobbz.spielobjekte;
 
 import programm.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Pink Ghost
@@ -11,11 +12,15 @@ public class Pinky extends Ghost {
         super(path, frightened);
 /*        startpos[0] = 240;
         startpos[1] = 268;*/
+/*        startpos[0] = 208;
+        startpos[1] = 268;*/
         startpos[0] = 208;
         startpos[1] = 216;
         setLocation(startpos[0], startpos[1]);
-        target[0] = current_target[0] = 32;
-        target[1] = current_target[1] = 0;
+        target[0] = 32;
+        target[1] = 0;
+        current_target[0] = targetinhouse[0];
+        current_target[1] = targetinhouse[1];
     }
 
     @Override

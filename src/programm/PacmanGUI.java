@@ -26,7 +26,7 @@ public class PacmanGUI extends JFrame {
     public final int WIDTH = 28 * RESOLUTION;
     public final int HEIGHT = 36 * RESOLUTION;
 
-    List<List<Integer>> wavelist = new ArrayList<>();
+    int wavelist[][] = new int[5][8];
     double speedlist[][] = new double[4][7];
 
     private ArrayList<Wall> walls = new ArrayList<>();
@@ -270,7 +270,18 @@ public class PacmanGUI extends JFrame {
                     double temp = 0;
                     int speedns = 0;
                     for (Ghost ghost : ghosts) {
-                        ghost.move();
+                        if (ghost instanceof Blinky) {
+                            ghost.move();
+                        }
+                        if (ghost instanceof Pinky) {
+                            ghost.move();
+                        }
+                        if (ghost instanceof Inky && dots.size() <= 242 - 30) {
+                            ghost.move();
+                        }
+                        if (ghost instanceof Clyde && dots.size() <= 242 - 80) {
+                            ghost.move();
+                        }
                         if (ghost.getCurrent_mode() == Ghost.FRIGHTENEDMODE)
                             row = 5;
                     }
@@ -360,19 +371,19 @@ public class PacmanGUI extends JFrame {
                                                                         public void run() {
                                                                             ghost.setCurrent_mode(Ghost.CHASEMODE);
                                                                         }
-                                                                    }, (long) wavelist.get(0).get(6) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(6));
+                                                                    }, (long) wavelist[0][6] == -1 ? Integer.MAX_VALUE : wavelist[0][6]);
                                                                 }
-                                                            }, (long) wavelist.get(0).get(5) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(5));
+                                                            }, (long) wavelist[0][5] == -1 ? Integer.MAX_VALUE : wavelist[0][5]);
                                                         }
-                                                    }, (long) wavelist.get(0).get(4) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(4));
+                                                    }, (long) wavelist[0][4] == -1 ? Integer.MAX_VALUE : wavelist[0][4]);
                                                 }
-                                            }, (long) wavelist.get(0).get(3) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(3));
+                                            }, (long) wavelist[0][3] == -1 ? Integer.MAX_VALUE : wavelist[0][3]);
                                         }
-                                    }, (long) wavelist.get(0).get(2) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(2));
+                                    }, (long) wavelist[0][2] == -1 ? Integer.MAX_VALUE : wavelist[0][2]);
                                 }
-                            }, (long) wavelist.get(0).get(1) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(1));
+                            }, (long) wavelist[0][1] == -1 ? Integer.MAX_VALUE : wavelist[0][1]);
                         }
-                    }, (long) wavelist.get(0).get(0) == -1 ? Integer.MAX_VALUE : wavelist.get(0).get(0));
+                    }, (long) wavelist[0][0] == -1 ? Integer.MAX_VALUE : wavelist[0][0]);
                 }
             }
         }
@@ -426,10 +437,16 @@ public class PacmanGUI extends JFrame {
                 break;
             else {
                 String[] strings = line.split(";");
-                wavelist.add(new ArrayList<Integer>());
+/*                wavelist.add(new ArrayList<Integer>());
                 wavelist.get(i).addAll(Arrays.asList(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]),
                         Integer.parseInt(strings[2]), Integer.parseInt(strings[3]), Integer.parseInt(strings[4]),
-                        Integer.parseInt(strings[5]), Integer.parseInt(strings[6]), Integer.parseInt(strings[7])));
+                        Integer.parseInt(strings[5]), Integer.parseInt(strings[6]), Integer.parseInt(strings[7])));*/
+                int j = 0;
+                for (String s : strings) {
+                    wavelist[i][j] = Integer.parseInt(s);
+                    j++;
+                }
+                i++;
             }
         }
 
@@ -445,7 +462,6 @@ public class PacmanGUI extends JFrame {
                 int j = 0;
                 for (String s : strings) {
                     speedlist[i][j] = Double.parseDouble(s);
-                    System.out.println("i: " + i + " j: " + j);
                     j++;
                 }
                 i++;

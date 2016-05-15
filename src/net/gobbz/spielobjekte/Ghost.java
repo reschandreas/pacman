@@ -1,13 +1,9 @@
 package net.gobbz.spielobjekte;
 
 import net.gobbz.grundobjekte.*;
-import javax.imageio.ImageIO;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -25,6 +21,9 @@ public abstract class Ghost extends Pacman {
 
     protected int current_mode = SCATTERMODE;
     protected int prev_mode = SCATTERMODE;
+    protected int[] targetinhouse = {240, 208};
+    protected int[] targetouthouse = {240, 208};
+    public boolean insidehouse;
 
     protected int[] target = new int[2];
 
@@ -32,6 +31,7 @@ public abstract class Ghost extends Pacman {
 
     public Ghost(String path) {
         super(path);
+        insidehouse = true;
         speed = 7;
         setEatable(false);
         current_target[0] = target[0];
@@ -77,6 +77,14 @@ public abstract class Ghost extends Pacman {
         }
     }
 
+    public boolean isInsidehouse() {
+        return insidehouse;
+    }
+
+    public void setInsidehouse(boolean insidehouse) {
+        this.insidehouse = insidehouse;
+    }
+
     @Override
     public void reStart() {
         setLocation(startpos[0], startpos[1]);
@@ -110,14 +118,14 @@ public abstract class Ghost extends Pacman {
     }
 
     protected void wayChooser() {
+        boolean correct = false;
+        int up = 0;
+        int down = 0;
+        int left = 0;
+        int right = 0;
+        int way = 0;
         Intersection i = intersectionCheck();
         if (i != null) {
-            boolean correct = false;
-            int up = 0;
-            int down = 0;
-            int left = 0;
-            int right = 0;
-            int way = 0;
             do {
                 if (current_mode != FRIGHTENEDMODE) {
                     if (up != -1)

@@ -15,8 +15,10 @@ public class Inky extends Ghost {
         startpos[0] = 208;
         startpos[1] = 216;
         setLocation(startpos[0], startpos[1]);
-        target[0] = current_target[0] = 432;
-        target[1] = current_target[1] = 560;
+        target[0] = 432;
+        target[1] = 560;
+        current_target[0] = targetinhouse[0];
+        current_target[1] = targetinhouse[1];
     }
 
     @Override
