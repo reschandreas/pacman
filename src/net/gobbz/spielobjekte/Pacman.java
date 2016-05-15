@@ -18,13 +18,13 @@ import java.net.URL;
  */
 public class Pacman extends Wall {
 
-    protected int x_speed = 0;
-    protected int y_speed = 0;
+    int x_speed = 0;
+    int y_speed = 0;
     private long points = 0;
 
     private int lives = 0;
 
-    protected int[] startpos = new int[2];
+    int[] startpos = new int[2];
 
     private Image image_right = null;
     private Image image_left = null;
@@ -34,10 +34,10 @@ public class Pacman extends Wall {
 
     private boolean eatable = true;
 
-    protected int x_next = 0;
-    protected int y_next = 0;
+    int x_next = 0;
+    int y_next = 0;
 
-    protected long speed = 5;
+    long speed = 5;
 
     public Pacman(String path) {
         super(path);
@@ -169,6 +169,54 @@ public class Pacman extends Wall {
         y_next = 0;
     }
 
+    public Image getImage_down() {
+        return image_down;
+    }
+
+    public void setImage_down(Image image_down) {
+        this.image_down = image_down;
+    }
+
+    public Image getImage_left() {
+        return image_left;
+    }
+
+    public void setImage_left(Image image_left) {
+        this.image_left = image_left;
+    }
+
+    public Image getImage_next() {
+        return image_next;
+    }
+
+    public void setImage_next(Image image_next) {
+        this.image_next = image_next;
+    }
+
+    public Image getImage_right() {
+        return image_right;
+    }
+
+    public void setImage_right(Image image_right) {
+        this.image_right = image_right;
+    }
+
+    public Image getImage_up() {
+        return image_up;
+    }
+
+    public void setImage_up(Image image_up) {
+        this.image_up = image_up;
+    }
+
+    public int[] getStartpos() {
+        return startpos;
+    }
+
+    public void setStartpos(int[] startpos) {
+        this.startpos = startpos;
+    }
+
     public int getX_speed() {
         return x_speed;
     }
@@ -222,7 +270,7 @@ public class Pacman extends Wall {
         return getY() + getHeight() / 2;
     }
 
-    protected void moveHorizontal() {
+    private void moveHorizontal() {
         if (x_speed == 1 || x_speed == -1) {
             if (x_speed == -1 && getX() < 0) {
                 setLocation(getParent().getWidth(), getY());
@@ -234,7 +282,7 @@ public class Pacman extends Wall {
         }
     }
 
-    protected void moveVertical() {
+    private void moveVertical() {
         if (y_speed == 1 || y_speed == -1) {
             if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
                 setLocation(getX(), getY() + y_speed);
@@ -259,9 +307,9 @@ public class Pacman extends Wall {
     }
 
     protected Intersection intersectionCheck() {
-        for (Intersection i : PacmanGUI.intersections) {
-            if (getX() == i.getX() && getY() == i.getY()) {
-                return i;
+        for (int i = 0; i < PacmanGUI.intersections.size(); i++) {
+            if (getX() == PacmanGUI.intersections.get(i).getX() && getY() == PacmanGUI.intersections.get(i).getY()) {
+                return PacmanGUI.intersections.get(i);
             }
         }
         return null;

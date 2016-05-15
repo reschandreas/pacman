@@ -7,8 +7,8 @@ import programm.*;
  */
 public class Clyde extends Ghost {
 
-    public Clyde(String path, String frightened) {
-        super(path, frightened);
+    public Clyde() {
+        super("ghost_orange.png", "ghost_frightened.png");
 /*        startpos[0] = 176;
         startpos[1] = 268;    */
 /*        startpos[0] = 208;

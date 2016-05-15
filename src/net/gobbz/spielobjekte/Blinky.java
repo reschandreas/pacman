@@ -8,8 +8,8 @@ import programm.*;
  */
 public class Blinky extends Ghost {
 
-    public Blinky(String path, String frightened) {
-        super(path, frightened);
+    public Blinky() {
+        super("ghost_red.png", "ghost_frightened.png");
         insidehouse = false;
         startpos[0] = 208;
         startpos[1] = 216;

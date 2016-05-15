@@ -8,8 +8,8 @@ import programm.*;
  */
 public class Inky extends Ghost {
 
-    public Inky(String path, String frightened) {
-        super(path, frightened);
+    public Inky() {
+        super("ghost_blue.png", "ghost_frightened.png");
 /*        startpos[0] = 208;
         startpos[1] = 268;*/
         startpos[0] = 208;

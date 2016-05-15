@@ -26,8 +26,10 @@ public class PacmanGUI extends JFrame {
     public final int WIDTH = 28 * RESOLUTION;
     public final int HEIGHT = 36 * RESOLUTION;
 
-    int wavelist[][] = new int[5][8];
-    double speedlist[][] = new double[4][7];
+    private int wavelist[][] = new int[5][8];
+    private double speedlist[][] = new double[4][7];
+
+    private ArrayList<Wall> lifelist = new ArrayList<>();
 
     private ArrayList<Wall> walls = new ArrayList<>();
     public static ArrayList<Intersection> intersections = new ArrayList<>();
@@ -63,11 +65,6 @@ public class PacmanGUI extends JFrame {
         container.setLayout(null);
 
         container.setBackground(Color.black);
-        //Loadingscreen
-        JWindow window = new JWindow();
-        window.setLocationRelativeTo(null);
-        window.setBounds(getX(), getY(), WIDTH, HEIGHT);
-        window.setVisible(true);
 
         readDatas();
 
@@ -95,23 +92,29 @@ public class PacmanGUI extends JFrame {
         l_level.setForeground(Color.white);
         container.add(l_level);
 
+        for (int i = 0; i < 3; i++) {
+            Wall wall = new Wall("../spielobjekte/pacman_right.png");
+            wall.setLocation(i * 32, 544);
+            lifelist.add(wall);
+            container.add(lifelist.get(i));
+        }
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        window.dispose();
 
-        ghosts.add(new Blinky("ghost_red.png", "ghost_frightened.png"));
+        ghosts.add(new Blinky());
         container.add(ghosts.get(0));
 
-        ghosts.add(new Inky("ghost_blue.png", "ghost_frightened.png"));
+        ghosts.add(new Inky());
         container.add(ghosts.get(1));
 
-        ghosts.add(new Pinky("ghost_pink.png", "ghost_frightened.png"));
+        ghosts.add(new Pinky());
         container.add(ghosts.get(2));
 
-        ghosts.add(new Clyde("ghost_orange.png", "ghost_frightened.png"));
+        ghosts.add(new Clyde());
         container.add(ghosts.get(3));
 
         container.add(pacman);
@@ -229,6 +232,7 @@ public class PacmanGUI extends JFrame {
                     }
                     drawMaze();
                 } while (pacman.getLives() != 0);
+
             }
         });
         moveThread.start();
@@ -312,6 +316,7 @@ public class PacmanGUI extends JFrame {
 
         );
         ghostThread.start();
+        checkGameOver();
         newGame();
         setVisible(true);
     }
@@ -400,6 +405,18 @@ public class PacmanGUI extends JFrame {
         nextLevel();
     }
 
+    public long checkGameOver() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (pacman.getLives() != 0) {
+
+                }
+            }
+        });
+        return pacman.getPoints();
+    }
+
     private boolean eatenDots() {
         int temp = dots.size();
         EventQueue.invokeLater(new Runnable() {
@@ -437,10 +454,6 @@ public class PacmanGUI extends JFrame {
                 break;
             else {
                 String[] strings = line.split(";");
-/*                wavelist.add(new ArrayList<Integer>());
-                wavelist.get(i).addAll(Arrays.asList(Integer.parseInt(strings[0]), Integer.parseInt(strings[1]),
-                        Integer.parseInt(strings[2]), Integer.parseInt(strings[3]), Integer.parseInt(strings[4]),
-                        Integer.parseInt(strings[5]), Integer.parseInt(strings[6]), Integer.parseInt(strings[7])));*/
                 int j = 0;
                 for (String s : strings) {
                     wavelist[i][j] = Integer.parseInt(s);
@@ -540,13 +553,20 @@ public class PacmanGUI extends JFrame {
     @Override
     public void paint(Graphics g) {
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.setColor(Color.green);
         for (Component component : container.getComponents()) {
             component.repaint();
         }
+        for (Wall wall : lifelist) {
+            wall.setVisible(false);
+        }
+        for (int i = 0; i < pacman.getLives(); i++) {
+            lifelist.get(i).setVisible(true);
+        }
+
     }
 
     public static void main(String[] args) {
-        new PacmanGUI();
+        new MenuGUI();
+        //new PacmanGUI();
     }
 }

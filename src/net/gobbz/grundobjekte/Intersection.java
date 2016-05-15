@@ -9,10 +9,10 @@ import java.awt.*;
  */
 public class Intersection extends JComponent {
 
-    protected final boolean up;
-    protected final boolean down;
-    protected final boolean right;
-    protected final boolean left;
+    private final boolean up;
+    private final boolean down;
+    private final boolean right;
+    private final boolean left;
 
     public Intersection(int x, int y, boolean up, boolean down, boolean right, boolean left) {
         setBounds(x, y, 2 * PacmanGUI.RESOLUTION, 2 * PacmanGUI.RESOLUTION);
