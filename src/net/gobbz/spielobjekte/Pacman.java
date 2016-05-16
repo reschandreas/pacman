@@ -39,7 +39,7 @@ public class Pacman extends Wall {
 
     long speed = 5;
 
-    public Pacman(String path) {
+    protected Pacman(String path) {
         super(path);
         setEatable(true);
         startpos[0] = 208;
@@ -50,9 +50,9 @@ public class Pacman extends Wall {
         x_next = -1;
     }
 
-    public Pacman(String up, String down, String left, String right) {
-        this(left);
-        URL url = this.getClass().getResource(up);
+    public Pacman() {
+        this("pacman_left.png");
+        URL url = this.getClass().getResource("pacman_up.png");
         if (url == null)
             System.out.println("Datei nicht gefunden");
         else {
@@ -69,7 +69,7 @@ public class Pacman extends Wall {
                 }
             }
         }
-        url = this.getClass().getResource(down);
+        url = this.getClass().getResource("pacman_down.png");
         if (url == null)
             System.out.println("Datei nicht gefunden");
         else {
@@ -86,7 +86,7 @@ public class Pacman extends Wall {
                 }
             }
         }
-        url = this.getClass().getResource(left);
+        url = this.getClass().getResource("pacman_left.png");
         if (url == null)
             System.out.println("Datei nicht gefunden");
         else {
@@ -103,7 +103,7 @@ public class Pacman extends Wall {
                 }
             }
         }
-        url = this.getClass().getResource(right);
+        url = this.getClass().getResource("pacman_right.png");
         if (url == null)
             System.out.println("Datei nicht gefunden");
         else {

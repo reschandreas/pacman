@@ -44,7 +44,7 @@ public class MenuGUI extends JFrame {
         final JLabel title = new JLabel("Pacman");
         title.setFont(new Font("PacFont", Font.BOLD, 32));
         title.setBounds(130, 110, 300, 50);
-        title.setForeground(Color.white);
+        title.setForeground(Color.yellow);
         container.add(title);
 
         JButton b_newgame = new JButton("Neues Spiel");
@@ -104,7 +104,7 @@ public class MenuGUI extends JFrame {
             }
         });
 
-        pacman = new Pacman("pacman_up.png", "pacman_down.png", "pacman_left.png", "pacman_right.png");
+        pacman = new Pacman();
         pacman.setLocation(0, 0);
         pacman.setImage(pacman.getImage_right());
         pacman.setX_speed(1);

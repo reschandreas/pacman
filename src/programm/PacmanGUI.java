@@ -36,7 +36,7 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
     public static ArrayList<Ghost> ghosts = new ArrayList<>();
-    static final public Pacman pacman = new Pacman("pacman_up.png", "pacman_down.png", "pacman_left.png", "pacman_right.png");
+    static final public Pacman pacman = new Pacman();
 
     private Thread moveThread;
     private Thread ghostThread;
@@ -93,7 +93,7 @@ public class PacmanGUI extends JFrame {
         container.add(l_level);
 
         for (int i = 0; i < 3; i++) {
-            Wall wall = new Wall("../spielobjekte/pacman_right.png");
+            Wall wall = new Wall("pacman_right.png");
             wall.setLocation(i * 32, 544);
             lifelist.add(wall);
             container.add(lifelist.get(i));
@@ -339,6 +339,7 @@ public class PacmanGUI extends JFrame {
 
     private void nextLevel() {
         level++;
+        l_level.setText(String.valueOf(level));
         for (Ghost ghost : ghosts) {
             ghost.setCurrent_mode(Ghost.SCATTERMODE);
         }
