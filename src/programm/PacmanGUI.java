@@ -269,10 +269,9 @@ public class PacmanGUI extends JFrame {
             public void run() {
                 while (!dots.isEmpty() && !caught()) {
                     int row = 4;
-                    double tempspeed = 0;
-                    long speedms = 0;
-                    double temp = 0;
-                    int speedns = 0;
+                    double tempspeed, temp;
+                    long speedms;
+                    int speedns;
                     for (Ghost ghost : ghosts) {
                         if (ghost instanceof Blinky) {
                             ghost.move();
@@ -316,7 +315,6 @@ public class PacmanGUI extends JFrame {
 
         );
         ghostThread.start();
-        checkGameOver();
         newGame();
         setVisible(true);
     }
@@ -409,9 +407,7 @@ public class PacmanGUI extends JFrame {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (pacman.getLives() != 0) {
-
-                }
+                while (pacman.getLives() != 0) {}
             }
         });
         return pacman.getPoints();
