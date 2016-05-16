@@ -124,7 +124,6 @@ public class Pacman extends Wall {
 
     public void reStart() {
         setLocation(startpos[0], startpos[1]);
-        lives = 3;
         points = 0;
         x_speed = x_next = -1;
         y_speed = y_next = 0;
@@ -149,6 +148,10 @@ public class Pacman extends Wall {
 
     public int getLives() {
         return lives;
+    }
+
+    public void deductLife() {
+        lives--;
     }
 
     public void setLives(int lives) {
@@ -301,6 +304,9 @@ public class Pacman extends Wall {
             intersection = null;
         }
         if (intersection == null) {
+            if (y_next == y_speed * -1 || x_next == x_speed * -1) {
+                changeDirection();
+            }
             moveHorizontal();
             moveVertical();
         }

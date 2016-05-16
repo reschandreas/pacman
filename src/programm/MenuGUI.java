@@ -27,7 +27,6 @@ public class MenuGUI extends JFrame {
     private String name;
     private long score;
 
-    private boolean clicked = false;
     private JTextField tf_name = null;
 
     public MenuGUI() {
@@ -38,6 +37,7 @@ public class MenuGUI extends JFrame {
         setResizable(false);
         setLayout(null);
         jFrame = this;
+        setFocusable(true);
         container = getContentPane();
         container.setBackground(Color.black);
 
@@ -69,32 +69,22 @@ public class MenuGUI extends JFrame {
             }
         });
 
-        tf_name = new JTextField("Dein Name");
-        tf_name.setFont(new Font("PacFont", Font.BOLD, 24));
+        tf_name = new JTextField("Dein Name", SwingConstants.CENTER);
+        tf_name.setFont(new Font("Arial", Font.BOLD, 24));
         tf_name.setBounds(75, 260, 300, 50);
         container.add(tf_name);
-        tf_name.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!clicked) {
-                    tf_name.setText("");
-                    clicked = true;
-                }
-            }
-        });
 
         addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
+
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE: {
+                    case KeyEvent.VK_ESCAPE:
                         jFrame.dispose();
-                        break;
-                    }
                 }
             }
 
@@ -108,27 +98,30 @@ public class MenuGUI extends JFrame {
         pacman.setLocation(0, 0);
         pacman.setImage(pacman.getImage_right());
         pacman.setX_speed(1);
+        pacman.setX_next(1);
         container.add(pacman);
 
         ghosts.add(new Blinky());
         container.add(ghosts.get(0));
         ghosts.get(0).setLocation(0, 0);
-        ghosts.get(0).setX_speed(1);
 
         ghosts.add(new Inky());
         container.add(ghosts.get(1));
         ghosts.get(1).setLocation(0, 0);
         ghosts.get(1).setX_speed(1);
+        ghosts.get(1).setX_next(1);
 
         ghosts.add(new Pinky());
         container.add(ghosts.get(2));
         ghosts.get(2).setLocation(0, 0);
         ghosts.get(2).setX_speed(1);
+        ghosts.get(2).setX_next(1);
 
         ghosts.add(new Clyde());
         container.add(ghosts.get(3));
         ghosts.get(3).setLocation(0, 0);
         ghosts.get(3).setX_speed(1);
+        ghosts.get(3).setX_next(1);
 
         final long starttime = System.currentTimeMillis();
         Thread animation = new Thread(new Runnable() {
@@ -150,41 +143,49 @@ public class MenuGUI extends JFrame {
                     for (Ghost ghost : ghosts) {
                         if (ghost.getX() == 0 && ghost.getY() == 0) {
                             ghost.setX_speed(1);
+                            ghost.setX_next(1);
                             ghost.setY_speed(0);
                         }
                         if (ghost.getX() == 416 && ghost.getY() == 0) {
                             ghost.setX_speed(0);
                             ghost.setY_speed(1);
+                            ghost.setY_next(1);
                         }
                         if (ghost.getX() == 416 && ghost.getY() == 544) {
                             ghost.setX_speed(-1);
                             ghost.setY_speed(0);
+                            ghost.setX_next(-1);
                         }
                         if (ghost.getX() == 0 && ghost.getY() == 544) {
                             ghost.setX_speed(0);
                             ghost.setY_speed(-1);
+                            ghost.setY_next(-1);
                         }
                     }
 
                     pacman.move();
                     if (pacman.getX() == 0 && pacman.getY() == 0) {
                         pacman.setX_speed(1);
+                        pacman.setX_next(1);
                         pacman.setY_speed(0);
                         pacman.setImage(pacman.getImage_right());
                     }
                     if (pacman.getX() == 416 && pacman.getY() == 0) {
                         pacman.setX_speed(0);
                         pacman.setY_speed(1);
+                        pacman.setY_next(1);
                         pacman.setImage(pacman.getImage_down());
                     }
                     if (pacman.getX() == 416 && pacman.getY() == 544) {
                         pacman.setX_speed(-1);
                         pacman.setY_speed(0);
+                        pacman.setX_next(-1);
                         pacman.setImage(pacman.getImage_left());
                     }
                     if (pacman.getX() == 0 && pacman.getY() == 544) {
                         pacman.setX_speed(0);
                         pacman.setY_speed(-1);
+                        pacman.setY_next(-1);
                         pacman.setImage(pacman.getImage_up());
                     }
                     try {
