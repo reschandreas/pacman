@@ -23,7 +23,7 @@ public class MenuGUI extends JFrame {
     private final Container container;
     private final Pacman pacman;
     private final ArrayList<Ghost> ghosts = new ArrayList<>();
-    private ArrayList<Score> highscores = new ArrayList<>();
+    public static ArrayList<Score> highscores = new ArrayList<>();
     private String name;
     private long score;
 
@@ -127,7 +127,7 @@ public class MenuGUI extends JFrame {
         Thread animation = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (!Thread.interrupted()) {
                     if (System.currentTimeMillis() - starttime >= 1000) {
                         ghosts.get(0).move();
                     }
@@ -240,9 +240,8 @@ public class MenuGUI extends JFrame {
     private void startGame() {
         if (tf_name.getText() != null && !tf_name.getText().isEmpty() && !tf_name.getText().equals("Dein Name")) {
             name = tf_name.getText();
-            PacmanGUI pacmanGUI = new PacmanGUI();
-            score = pacmanGUI.checkGameOver();
-            highscores.add(new Score(name, score));
+            new PacmanGUI();
+            jFrame.dispose();
         } else {
             final JDialog dialog = new JDialog();
             dialog.setBounds(0, 0, 200, 100);

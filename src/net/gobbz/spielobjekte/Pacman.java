@@ -23,6 +23,7 @@ public class Pacman extends Wall {
     private long points = 0;
 
     private int lives = 0;
+    public static int amount = 0;
 
     int[] startpos = new int[2];
 
@@ -277,7 +278,7 @@ public class Pacman extends Wall {
         if (x_speed == 1 || x_speed == -1) {
             if (x_speed == -1 && getX() < 0) {
                 setLocation(getParent().getWidth(), getY());
-            } else if (x_speed == 1 && getX() + getWidth() + x_speed > getParent().getWidth()) {
+            } else if (x_speed == 1 && getX() + getWidth() + x_speed > PacmanGUI.WIDTH) {
                 setLocation(x_speed, getY());
             } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
                 setLocation(getX() + x_speed, getY());

@@ -23,8 +23,10 @@ public class PacmanGUI extends JFrame {
 
     public static final int RESOLUTION = 16;
 
-    public final int WIDTH = 28 * RESOLUTION;
-    public final int HEIGHT = 36 * RESOLUTION;
+    public static final int WIDTH = 28 * RESOLUTION;
+    public static final int HEIGHT = 36 * RESOLUTION;
+    public static String playername = null;
+    public static long playerpoints;
 
     private int wavelist[][] = new int[5][8];
     private double speedlist[][] = new double[4][7];
@@ -36,7 +38,7 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
     public static ArrayList<Ghost> ghosts = new ArrayList<>();
-    static final public Pacman pacman = new Pacman();
+    public static Pacman pacman;
 
     private Thread moveThread;
     private Thread ghostThread;
@@ -63,26 +65,8 @@ public class PacmanGUI extends JFrame {
         setUndecorated(true);
         setLocationRelativeTo(null);
         setResizable(false);
+        setFocusable(true);
         jFrame = this;
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE:
-                        jFrame.dispose();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        });
 
         container = getContentPane();
         container.setLayout(null);
@@ -140,6 +124,7 @@ public class PacmanGUI extends JFrame {
         ghosts.add(new Clyde());
         container.add(ghosts.get(3));
 
+        pacman = new Pacman();
         container.add(pacman);
 
         addKeyListener(new KeyListener() {
@@ -150,6 +135,10 @@ public class PacmanGUI extends JFrame {
                            @Override
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
+                                   case KeyEvent.VK_ESCAPE:
+                                       new MenuGUI();
+                                       jFrame.dispose();
+                                       break;
                                    case KeyEvent.VK_M: {
                                        System.out.println(getMousePosition().getX() + " " + getMousePosition().getY());
                                        break;
@@ -209,7 +198,7 @@ public class PacmanGUI extends JFrame {
             @Override
             public void run() {
                 do {
-                    while (!dots.isEmpty() && !caught()) {
+                    while (!Thread.interrupted() && !dots.isEmpty() && !caught()) {
                         pacman.move();
                         int row;
                         boolean eaten = eatenDots();
@@ -256,8 +245,11 @@ public class PacmanGUI extends JFrame {
                         continueLevel();
                     }
                     drawMaze();
-                } while (pacman.getLives() > 0);
-
+                } while (!Thread.interrupted() && pacman.getLives() > 0);
+                playerpoints = pacman.getPoints();
+                MenuGUI.highscores.add(new Score(playername, playerpoints));
+                new MenuGUI();
+                jFrame.dispose();
             }
         });
         moveThread.start();
@@ -293,25 +285,25 @@ public class PacmanGUI extends JFrame {
             @Override
             public void run() {
                 do {
-                    while (!dots.isEmpty() && !caught()) {
+                    while (!Thread.interrupted() && !dots.isEmpty() && !caught()) {
                         int row = 4;
                         double tempspeed, temp;
                         long speedms;
                         int speedns;
-                        for (Ghost ghost : ghosts) {
-                            if (ghost instanceof Blinky) {
-                                ghost.move();
+                        for (int i = 0; i < ghosts.size(); i++) {
+                            if (ghosts.get(i) instanceof Blinky) {
+                                ghosts.get(i).move();
                             }
-                            if (ghost instanceof Pinky) {
-                                ghost.move();
+                            if (ghosts.get(i) instanceof Pinky) {
+                                ghosts.get(i).move();
                             }
-                            if (ghost instanceof Inky && dots.size() <= 242 - 30) {
-                                ghost.move();
+                            if (ghosts.get(i) instanceof Inky && dots.size() <= 242 - 30) {
+                                ghosts.get(i).move();
                             }
-                            if (ghost instanceof Clyde && dots.size() <= 242 - 80) {
-                                ghost.move();
+                            if (ghosts.get(i) instanceof Clyde && dots.size() <= 242 - 80) {
+                                ghosts.get(i).move();
                             }
-                            if (ghost.getCurrent_mode() == Ghost.FRIGHTENEDMODE)
+                            if (ghosts.get(i).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
                                 row = 5;
                         }
                         switch (level) {
@@ -349,7 +341,7 @@ public class PacmanGUI extends JFrame {
                         continueLevel();
                     }
                     drawMaze();
-                } while (pacman.getLives() > 0);
+                } while (!Thread.interrupted() && pacman.getLives() > 0);
             }
         }
 
