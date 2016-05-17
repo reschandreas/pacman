@@ -73,6 +73,7 @@ public class MenuGUI extends JFrame {
         tf_name.setFont(new Font("Arial", Font.BOLD, 24));
         tf_name.setBounds(75, 260, 300, 50);
         container.add(tf_name);
+        readScores();
 
         addKeyListener(new KeyListener() {
             @Override
@@ -84,7 +85,9 @@ public class MenuGUI extends JFrame {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ESCAPE:
+                        writeScores();
                         jFrame.dispose();
+                        break;
                 }
             }
 
@@ -222,19 +225,20 @@ public class MenuGUI extends JFrame {
     }
 
     private void readScores() {
-        Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("scores.data")).useDelimiter("\\n");
-        while (true) {
-            String line = reader.hasNext() ? reader.next() : "";
-            if (line == null || line.isEmpty())
-                // Dateiende erkannt
-                break;
-            else {
-                String[] strings = line.split(";");
-                System.out.println(Arrays.toString(strings));
-                highscores.add(new Score(strings[0], Long.parseLong(strings[1])));
+        if (highscores.isEmpty()) {
+            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("scores.data")).useDelimiter("\\n");
+            while (true) {
+                String line = reader.hasNext() ? reader.next() : "";
+                if (line == null || line.isEmpty())
+                    // Dateiende erkannt
+                    break;
+                else {
+                    String[] strings = line.split(";");
+                    System.out.println(Arrays.toString(strings));
+                    highscores.add(new Score(strings[0], Long.parseLong(strings[1])));
+                }
             }
         }
-
     }
 
     private void startGame() {
@@ -283,7 +287,6 @@ public class MenuGUI extends JFrame {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ESCAPE: {
                         dialog.dispose();
-                        writeScores();
                         break;
                     }
                 }
@@ -305,7 +308,6 @@ public class MenuGUI extends JFrame {
         dialog.setLocationRelativeTo(jFrame);
         dialog.add(title);
         dialog.getContentPane().setBackground(Color.black);
-        readScores();
         sortScores();
         for (int i = 0; i < highscores.size(); i++) {
             JLabel name = new JLabel(i + 1 + "." + highscores.get(i).getName());
