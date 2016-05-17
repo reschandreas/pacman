@@ -125,7 +125,6 @@ public class Pacman extends Wall {
 
     public void reStart() {
         setLocation(startpos[0], startpos[1]);
-        points = 0;
         x_speed = x_next = -1;
         y_speed = y_next = 0;
         image = image_next = image_left;
@@ -314,9 +313,11 @@ public class Pacman extends Wall {
     }
 
     protected Intersection intersectionCheck() {
-        for (int i = 0; i < PacmanGUI.intersections.size(); i++) {
-            if (getX() == PacmanGUI.intersections.get(i).getX() && getY() == PacmanGUI.intersections.get(i).getY()) {
-                return PacmanGUI.intersections.get(i);
+        if (PacmanGUI.intersections != null) {
+            for (int i = 0; i < PacmanGUI.intersections.size(); i++) {
+                if (getX() == PacmanGUI.intersections.get(i).getX() && getY() == PacmanGUI.intersections.get(i).getY()) {
+                    return PacmanGUI.intersections.get(i);
+                }
             }
         }
         return null;

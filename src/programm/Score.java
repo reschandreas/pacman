@@ -7,12 +7,15 @@ public class Score {
 
     private String name = null;
     private long score = 0;
+    private int level = 1;
 
-    public Score(String name, long score) {
+    public Score(String name, int level, long score) {
         if (name != null && !name.isEmpty())
             this.name = name;
         if (score > 0)
             this.score = score;
+        if (level > 1)
+            this.level = level;
     }
 
     public long getScore() {
@@ -42,7 +45,8 @@ public class Score {
     public long compareTo(Score score) {
         long ret = this.score - score.score;
         if (ret == 0) {
-            ret = score.name.compareTo(name);
+            ret = name.compareTo(score.name);
+            System.out.println();
         }
         return ret;
     }
@@ -61,6 +65,6 @@ public class Score {
 
     @Override
     protected Score clone() {
-        return new Score(name, score);
+        return new Score(name, level, score);
     }
 }

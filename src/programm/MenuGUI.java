@@ -235,7 +235,7 @@ public class MenuGUI extends JFrame {
                 else {
                     String[] strings = line.split(";");
                     System.out.println(Arrays.toString(strings));
-                    highscores.add(new Score(strings[0], Long.parseLong(strings[1])));
+                    highscores.add(new Score(strings[0], Integer.parseInt(strings[1]), Long.parseLong(strings[2])));
                 }
             }
         }
@@ -243,7 +243,8 @@ public class MenuGUI extends JFrame {
 
     private void startGame() {
         if (tf_name.getText() != null && !tf_name.getText().isEmpty() && !tf_name.getText().equals("Dein Name")) {
-            name = tf_name.getText();
+            PacmanGUI.playerpoints = 0;
+            PacmanGUI.playername = tf_name.getText();
             new PacmanGUI();
             jFrame.dispose();
         } else {

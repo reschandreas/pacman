@@ -27,6 +27,7 @@ public class PacmanGUI extends JFrame {
     public static final int HEIGHT = 36 * RESOLUTION;
     public static String playername = null;
     public static long playerpoints;
+    public static int playerlevel = -1;
 
     private int wavelist[][] = new int[5][8];
     private double speedlist[][] = new double[4][7];
@@ -34,11 +35,11 @@ public class PacmanGUI extends JFrame {
     private ArrayList<Wall> lifelist = new ArrayList<>();
 
     private ArrayList<Wall> walls = new ArrayList<>();
-    public static ArrayList<Intersection> intersections = new ArrayList<>();
+    public static ArrayList<Intersection> intersections = null;
     private ArrayList<Dot> dots = new ArrayList<>();
     private ArrayList<Tile> tiles = new ArrayList<>();
-    public static ArrayList<Ghost> ghosts = new ArrayList<>();
-    public static Pacman pacman;
+    public static ArrayList<Ghost> ghosts = null;
+    public static Pacman pacman = null;
 
     private Thread moveThread;
     private Thread ghostThread;
@@ -73,6 +74,9 @@ public class PacmanGUI extends JFrame {
 
         container.setBackground(Color.black);
 
+        intersections = new ArrayList<>();
+        ghosts = new ArrayList<>();
+
         readDatas();
 
         drawMaze();
@@ -104,12 +108,6 @@ public class PacmanGUI extends JFrame {
             wall.setLocation(i * 32, 544);
             lifelist.add(wall);
             container.add(lifelist.get(i));
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
 
         ghosts.add(new Blinky());
@@ -246,10 +244,7 @@ public class PacmanGUI extends JFrame {
                     }
                     drawMaze();
                 } while (!Thread.interrupted() && pacman.getLives() > 0);
-                playerpoints = pacman.getPoints();
-                MenuGUI.highscores.add(new Score(playername, playerpoints));
-                new MenuGUI();
-                jFrame.dispose();
+                gameOver();
             }
         });
         moveThread.start();
@@ -351,6 +346,19 @@ public class PacmanGUI extends JFrame {
         setVisible(true);
     }
 
+    private void newGame() {
+        level = 0;
+        pacman.setPoints(0);
+        pacman.setLives(3);
+        nextLevel();
+    }
+
+    private void gameOver() {
+        MenuGUI.highscores.add(new Score(playername, playerlevel, playerpoints));
+        new MenuGUI();
+        jFrame.dispose();
+    }
+
     private void continueLevel() {
         for (Ghost ghost : ghosts) {
             ghost.reStart();
@@ -364,8 +372,7 @@ public class PacmanGUI extends JFrame {
             if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY())
                 if (ghost.isEatable()) {
                     ghost.reStart();
-                }
-                else {
+                } else {
                     if (!caught) {
                         pacman.deductLife();
                         caught = true;
@@ -378,9 +385,13 @@ public class PacmanGUI extends JFrame {
     }
 
     private void nextLevel() {
-        level++;
-        l_level.setText(String.valueOf(level));
+        if (level != playerlevel) {
+            level++;
+            l_level.setText(String.valueOf(level));
+            playerlevel = level;
+        }
         for (Ghost ghost : ghosts) {
+            ghost.reStart();
             ghost.setCurrent_mode(Ghost.SCATTERMODE);
         }
         final int row;
@@ -446,28 +457,6 @@ public class PacmanGUI extends JFrame {
             }, (long) wavelist[row][row] == -1 ? Integer.MAX_VALUE : wavelist[row][0]);
         }
         pacman.reStart();
-        for (Ghost ghost : ghosts) {
-            ghost.reStart();
-        }
-    }
-
-    private void newGame() {
-        level = 0;
-        pacman.setPoints(0);
-        pacman.setLives(3);
-        nextLevel();
-    }
-
-    public long checkGameOver() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (pacman.getLives() > 0) {
-                }
-            }
-        });
-        thread.start();
-        return pacman.getPoints();
     }
 
     private boolean eatenDots() {
@@ -487,6 +476,7 @@ public class PacmanGUI extends JFrame {
                         dots.get(i).die();
                         pacman.setPoints(pacman.getPoints() + dots.get(i).getPoints());
                         l_score.setText(String.valueOf(pacman.getPoints()));
+                        playerpoints = pacman.getPoints();
                         dots.remove(i);
                         container.repaint();
                         break;
