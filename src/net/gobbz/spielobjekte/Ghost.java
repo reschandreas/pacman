@@ -1,6 +1,7 @@
 package net.gobbz.spielobjekte;
 
 import net.gobbz.grundobjekte.*;
+import programm.PacmanGUI;
 
 import java.awt.*;
 import java.net.URL;
@@ -21,8 +22,9 @@ public abstract class Ghost extends Pacman {
 
     protected int current_mode = SCATTERMODE;
     protected int prev_mode = SCATTERMODE;
-    protected int[] targetinhouse = {240, 208};
-    protected int[] targetouthouse = {240, 208};
+    public static int[] targetinhouse = {208, 240};
+    public static int[] targetouthouse = {208, 216};
+
     public boolean insidehouse;
 
     protected int[] target = new int[2];
@@ -86,10 +88,18 @@ public abstract class Ghost extends Pacman {
     }
 
     @Override
-    public void reStart() {
+    public void start() {
         setLocation(startpos[0], startpos[1]);
         x_speed = x_next = -1;
         y_speed = y_next = 0;
+        insidehouse = true;
+    }
+
+    public void resume() {
+        setLocation(targetinhouse[0], targetinhouse[1]);
+        x_speed = x_next = -1;
+        y_speed = y_next = 0;
+        insidehouse = true;
     }
 
     private int compareWays(int a, int b) {
@@ -117,179 +127,199 @@ public abstract class Ghost extends Pacman {
             return c;
     }
 
-    protected void wayChooser() {
+    private void wayChooser() {
         boolean correct = false;
         int up = 0;
         int down = 0;
         int left = 0;
         int right = 0;
         int way = 0;
-        Intersection i = intersectionCheck();
-        if (i != null) {
-            do {
-                if (current_mode != FRIGHTENEDMODE) {
-                    if (up != -1)
-                        up = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY());
-                    if (down != -1)
-                        down = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
-                    if (left != -1)
-                        left = pythagoras(current_target[0], current_target[1], i.getX(), i.getY() + i.getHeight() / 2);
-                    if (right != -1)
-                        right = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
-                }
-                switch (getX_speed()) {
-                    //Von rechts in die Kreuzung
-                    case -1: {
-                        if (current_mode != FRIGHTENEDMODE) {
-                            way = compareWays(up, down, left);
-                            if (way == up)
-                                way = 1;
-                            else if (way == down)
-                                way = 2;
-                            else if (way == left)
-                                way = 3;
-                        } else way = random.nextInt(3) + 1;
-                        switch (way) {
-                            case 1:
-                                if (i.isUp()) {
-                                    setY_next(-1);
-                                    correct = true;
-                                } else {
-                                    up = -1;
-                                }
-                                break;
-                            case 2:
-                                if (i.isDown()) {
-                                    setY_next(1);
-                                    correct = true;
-                                } else {
-                                    down = -1;
-                                }
-                                break;
-                            case 3:
-                                if (i.isLeft()) {
-                                    setX_next(-1);
-                                    correct = true;
-                                } else {
-                                    left = -1;
-                                }
-                                break;
-                        }
-                        break;
+        if (getX() == 240 && getY() == 268 || getX() == 176 && getY() == 268) {
+            x_speed *= -1;
+        }
+        if (insidehouse) {
+            if (getX() == targetinhouse[0] && getY() == targetinhouse[1]) {
+                x_speed = 0;
+                y_speed = -1;
+                x_next = -1;
+                y_next = 0;
+            }
+            if (getX() == targetouthouse[0] && getY() == targetouthouse[1]) {
+                x_speed = -1;
+                y_speed = 0;
+                x_next = 0;
+                y_next = 1;
+                setTarget(target);
+                insidehouse = false;
+            }
+        } else {
+            Intersection i = intersectionCheck();
+            if (i != null) {
+                do {
+                    if (current_mode != FRIGHTENEDMODE) {
+                        if (up != -1)
+                            up = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY());
+                        if (down != -1)
+                            down = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
+                        if (left != -1)
+                            left = pythagoras(current_target[0], current_target[1], i.getX(), i.getY() + i.getHeight() / 2);
+                        if (right != -1)
+                            right = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
                     }
-                    //Von links in die Kreuzung
-                    case 1: {
-                        if (current_mode != FRIGHTENEDMODE) {
-                            way = compareWays(up, down, right);
-                            if (way == up)
-                                way = 1;
-                            else if (way == down)
-                                way = 2;
-                            else if (way == right)
-                                way = 3;
-                        } else way = random.nextInt(3) + 1;
-                        switch (way) {
-                            case 1:
-                                if (i.isUp()) {
-                                    setY_next(-1);
-                                    correct = true;
-                                } else {
-                                    up = -1;
-                                }
-                                break;
-                            case 2:
-                                if (i.isDown()) {
-                                    setY_next(1);
-                                    correct = true;
-                                } else {
-                                    down = -1;
-                                }
-                                break;
-                            case 3:
-                                if (i.isRight()) {
-                                    setX_next(1);
-                                    correct = true;
-                                } else {
-                                    right = -1;
-                                }
-                                break;
+                    switch (getX_speed()) {
+                        //Von rechts in die Kreuzung
+                        case -1: {
+                            if (current_mode != FRIGHTENEDMODE) {
+                                way = compareWays(up, down, left);
+                                if (way == up)
+                                    way = 1;
+                                else if (way == down)
+                                    way = 2;
+                                else if (way == left)
+                                    way = 3;
+                            } else way = random.nextInt(3) + 1;
+                            switch (way) {
+                                case 1:
+                                    if (i.isUp()) {
+                                        setY_next(-1);
+                                        correct = true;
+                                    } else {
+                                        up = -1;
+                                    }
+                                    break;
+                                case 2:
+                                    if (i.isDown()) {
+                                        setY_next(1);
+                                        correct = true;
+                                    } else {
+                                        down = -1;
+                                    }
+                                    break;
+                                case 3:
+                                    if (i.isLeft()) {
+                                        setX_next(-1);
+                                        correct = true;
+                                    } else {
+                                        left = -1;
+                                    }
+                                    break;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                }
-                switch (getY_speed()) {
-                    case -1: {
-                        if (current_mode != FRIGHTENEDMODE) {
-                            way = compareWays(up, left, right);
-                            if (way == up)
-                                way = 1;
-                            else if (way == left)
-                                way = 2;
-                            else if (way == right)
-                                way = 3;
-                        } else way = random.nextInt(3) + 1;
-                        switch (way) {
-                            case 1:
-                                if (i.isUp()) {
-                                    setY_next(-1);
-                                    correct = true;
-                                } else
-                                    up = -1;
-                                break;
-                            case 2:
-                                if (i.isLeft()) {
-                                    setX_next(-1);
-                                    correct = true;
-                                } else
-                                    left = -1;
-                                break;
-                            case 3:
-                                if (i.isRight()) {
-                                    setX_next(1);
-                                    correct = true;
-                                } else
-                                    right = -1;
-                                break;
+                        //Von links in die Kreuzung
+                        case 1: {
+                            if (current_mode != FRIGHTENEDMODE) {
+                                way = compareWays(up, down, right);
+                                if (way == up)
+                                    way = 1;
+                                else if (way == down)
+                                    way = 2;
+                                else if (way == right)
+                                    way = 3;
+                            } else way = random.nextInt(3) + 1;
+                            switch (way) {
+                                case 1:
+                                    if (i.isUp()) {
+                                        setY_next(-1);
+                                        correct = true;
+                                    } else {
+                                        up = -1;
+                                    }
+                                    break;
+                                case 2:
+                                    if (i.isDown()) {
+                                        setY_next(1);
+                                        correct = true;
+                                    } else {
+                                        down = -1;
+                                    }
+                                    break;
+                                case 3:
+                                    if (i.isRight()) {
+                                        setX_next(1);
+                                        correct = true;
+                                    } else {
+                                        right = -1;
+                                    }
+                                    break;
+                            }
+                            break;
                         }
-                        break;
                     }
-                    case 1: {
-                        if (current_mode != FRIGHTENEDMODE) {
-                            way = compareWays(down, left, right);
-                            if (way == down)
-                                way = 1;
-                            else if (way == left)
-                                way = 2;
-                            else if (way == right)
-                                way = 3;
-                        } else way = random.nextInt(3) + 1;
-                        switch (way) {
-                            case 1:
-                                if (i.isDown()) {
-                                    setY_next(1);
-                                    correct = true;
-                                } else
-                                    down = -1;
-                                break;
-                            case 2:
-                                if (i.isLeft()) {
-                                    setX_next(-1);
-                                    correct = true;
-                                } else
-                                    left = -1;
-                                break;
-                            case 3:
-                                if (i.isRight()) {
-                                    setX_next(1);
-                                    correct = true;
-                                } else
-                                    right = -1;
-                                break;
+                    switch (getY_speed()) {
+                        case -1: {
+                            if (current_mode != FRIGHTENEDMODE) {
+                                way = compareWays(up, left, right);
+                                if (way == up)
+                                    way = 1;
+                                else if (way == left)
+                                    way = 2;
+                                else if (way == right)
+                                    way = 3;
+                            } else way = random.nextInt(3) + 1;
+                            switch (way) {
+                                case 1:
+                                    if (i.isUp()) {
+                                        setY_next(-1);
+                                        correct = true;
+                                    } else
+                                        up = -1;
+                                    break;
+                                case 2:
+                                    if (i.isLeft()) {
+                                        setX_next(-1);
+                                        correct = true;
+                                    } else
+                                        left = -1;
+                                    break;
+                                case 3:
+                                    if (i.isRight()) {
+                                        setX_next(1);
+                                        correct = true;
+                                    } else
+                                        right = -1;
+                                    break;
+                            }
+                            break;
                         }
-                        break;
+                        case 1: {
+                            if (current_mode != FRIGHTENEDMODE) {
+                                way = compareWays(down, left, right);
+                                if (way == down)
+                                    way = 1;
+                                else if (way == left)
+                                    way = 2;
+                                else if (way == right)
+                                    way = 3;
+                            } else way = random.nextInt(3) + 1;
+                            switch (way) {
+                                case 1:
+                                    if (i.isDown()) {
+                                        setY_next(1);
+                                        correct = true;
+                                    } else
+                                        down = -1;
+                                    break;
+                                case 2:
+                                    if (i.isLeft()) {
+                                        setX_next(-1);
+                                        correct = true;
+                                    } else
+                                        left = -1;
+                                    break;
+                                case 3:
+                                    if (i.isRight()) {
+                                        setX_next(1);
+                                        correct = true;
+                                    } else
+                                        right = -1;
+                                    break;
+                            }
+                            break;
+                        }
                     }
-                }
-            } while (!correct);
+                } while (!correct);
+            }
         }
     }
 
@@ -300,11 +330,11 @@ public abstract class Ghost extends Pacman {
         super.move();
     }
 
-    protected void calculateTarget() {
+    public void calculateTarget() {
         setCurrent_target(target);
     }
 
-    public int getCurrent_mode() {
+    public int getCurrentMode() {
         return current_mode;
     }
 
@@ -357,20 +387,22 @@ public abstract class Ghost extends Pacman {
     }
 
     public void modes(int mode) {
-        prev_mode = current_mode;
-        switch (mode) {
-            case SCATTERMODE:
-                current_mode = mode;
-                scatterMode();
-                break;
-            case CHASEMODE:
-                current_mode = mode;
-                chaseMode();
-                break;
-            case FRIGHTENEDMODE:
-                current_mode = mode;
-                frightenedMode();
-                break;
+        if (!insidehouse) {
+            prev_mode = current_mode;
+            switch (mode) {
+                case SCATTERMODE:
+                    current_mode = mode;
+                    scatterMode();
+                    break;
+                case CHASEMODE:
+                    current_mode = mode;
+                    chaseMode();
+                    break;
+                case FRIGHTENEDMODE:
+                    current_mode = mode;
+                    frightenedMode();
+                    break;
+            }
         }
     }
 

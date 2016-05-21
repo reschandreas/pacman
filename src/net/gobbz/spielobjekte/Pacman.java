@@ -23,7 +23,6 @@ public class Pacman extends Wall {
     private long points = 0;
 
     private int lives = 0;
-    public static int amount = 0;
 
     int[] startpos = new int[2];
 
@@ -123,7 +122,7 @@ public class Pacman extends Wall {
         }
     }
 
-    public void reStart() {
+    public void start() {
         setLocation(startpos[0], startpos[1]);
         x_speed = x_next = -1;
         y_speed = y_next = 0;
@@ -273,7 +272,7 @@ public class Pacman extends Wall {
         return getY() + getHeight() / 2;
     }
 
-    private void moveHorizontal() {
+    protected void moveHorizontal() {
         if (x_speed == 1 || x_speed == -1) {
             if (x_speed == -1 && getX() < 0) {
                 setLocation(getParent().getWidth(), getY());
@@ -285,7 +284,7 @@ public class Pacman extends Wall {
         }
     }
 
-    private void moveVertical() {
+    protected void moveVertical() {
         if (y_speed == 1 || y_speed == -1) {
             if (!(getObjektBei(getX(), getY() + y_speed) instanceof Wall)) {
                 setLocation(getX(), getY() + y_speed);
@@ -306,6 +305,9 @@ public class Pacman extends Wall {
         if (intersection == null) {
             if (y_next == y_speed * -1 || x_next == x_speed * -1) {
                 changeDirection();
+            }
+            if (getX() == 240 && getY() == 268) {
+                x_speed = -1;
             }
             moveHorizontal();
             moveVertical();

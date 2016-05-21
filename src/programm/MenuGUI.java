@@ -70,7 +70,7 @@ public class MenuGUI extends JFrame {
         });
 
         tf_name = new JTextField("Dein Name", SwingConstants.CENTER);
-        tf_name.setFont(new Font("Arial", Font.BOLD, 24));
+        tf_name.setFont(new Font("Serif", Font.BOLD, 24));
         tf_name.setBounds(75, 260, 300, 50);
         container.add(tf_name);
         readScores();
@@ -226,17 +226,20 @@ public class MenuGUI extends JFrame {
 
     private void readScores() {
         if (highscores.isEmpty()) {
-            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("scores.data")).useDelimiter("\\n");
-            while (true) {
-                String line = reader.hasNext() ? reader.next() : "";
-                if (line == null || line.isEmpty())
-                    // Dateiende erkannt
-                    break;
-                else {
-                    String[] strings = line.split(";");
-                    System.out.println(Arrays.toString(strings));
-                    highscores.add(new Score(strings[0], Integer.parseInt(strings[1]), Long.parseLong(strings[2])));
+            try {
+            BufferedReader reader = new BufferedReader(new FileReader("./scores.data"));
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null || line.isEmpty())
+                        // Dateiende erkannt
+                        break;
+                    else {
+                        String[] strings = line.split(";");
+                        highscores.add(new Score(strings[0], Integer.parseInt(strings[1]), Long.parseLong(strings[2])));
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -310,12 +313,13 @@ public class MenuGUI extends JFrame {
         dialog.add(title);
         dialog.getContentPane().setBackground(Color.black);
         sortScores();
+        writeScores();
         for (int i = 0; i < highscores.size(); i++) {
             JLabel name = new JLabel(i + 1 + "." + highscores.get(i).getName());
-            name.setBounds(45, 40 + i * 30, 100, 30);
+            name.setBounds(45, 40 + i * 30, 200, 30);
             name.setForeground(Color.WHITE);
             JLabel score = new JLabel(String.valueOf(highscores.get(i).getScore()));
-            score.setBounds(145, 40 + i * 30, 100, 30);
+            score.setBounds(245, 40 + i * 30, 100, 30);
             score.setForeground(Color.white);
             dialog.add(name);
             dialog.add(score);
@@ -339,15 +343,15 @@ public class MenuGUI extends JFrame {
     private void writeScores() {
         sortScores();
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("scores.data"));
-            for (Score x : highscores) {
-                if (x != null) {
-                    System.out.println(x.toString());
-                    writer.write(x.toString());
+            BufferedWriter writer = new BufferedWriter(new FileWriter("./scores.data"));
+            for (Score highscore : highscores) {
+                if (highscore != null) {
+                    writer.write(highscore.toString());
                     writer.write("\n");
                     writer.flush();
                 }
             }
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

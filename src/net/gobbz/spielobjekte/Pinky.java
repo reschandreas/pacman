@@ -10,12 +10,12 @@ public class Pinky extends Ghost {
 
     public Pinky() {
         super("ghost_pink.png", "ghost_frightened.png");
-/*        startpos[0] = 240;
-        startpos[1] = 268;*/
+        startpos[0] = 240;
+        startpos[1] = 268;
 /*        startpos[0] = 208;
         startpos[1] = 268;*/
-        startpos[0] = 208;
-        startpos[1] = 216;
+/*        startpos[0] = 208;
+        startpos[1] = 216;*/
         setLocation(startpos[0], startpos[1]);
         target[0] = 32;
         target[1] = 0;
@@ -24,8 +24,17 @@ public class Pinky extends Ghost {
     }
 
     @Override
-    protected void calculateTarget() {
-        if (getCurrent_mode() == CHASEMODE) {
+    public void start() {
+        super.start();
+        x_speed = -1;
+        x_next = 0;
+        y_speed = 0;
+        y_next = -1;
+    }
+
+    @Override
+    public void calculateTarget() {
+        if (getCurrentMode() == CHASEMODE) {
             int x = 0;
             int y = 0;
             switch (PacmanGUI.pacman.getX_speed()) {

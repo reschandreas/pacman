@@ -26,8 +26,8 @@ public class Blinky extends Ghost {
     }
 
     @Override
-    protected void calculateTarget() {
-        if (getCurrent_mode() == CHASEMODE) {
+    public void calculateTarget() {
+        if (getCurrentMode() == CHASEMODE) {
             setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
         } else {
             super.calculateTarget();

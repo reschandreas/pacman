@@ -10,11 +10,11 @@ public class Clyde extends Ghost {
     public Clyde() {
         super("ghost_orange.png", "ghost_frightened.png");
 /*        startpos[0] = 176;
-        startpos[1] = 268;    */
-/*        startpos[0] = 208;
         startpos[1] = 268;*/
-        startpos[0] = 208;
-        startpos[1] = 216;
+        startpos[0] = 240;
+        startpos[1] = 268;
+/*        startpos[0] = 208;
+        startpos[1] = 216;*/
         setLocation(startpos[0], startpos[1]);
         target[0] = 0;
         target[1] = 560;
@@ -23,8 +23,17 @@ public class Clyde extends Ghost {
     }
 
     @Override
-    protected void calculateTarget() {
-        if (getCurrent_mode() == CHASEMODE) {
+    public void start() {
+        super.start();
+        x_speed = -1;
+        x_next = 0;
+        y_speed = 0;
+        y_next = -1;
+    }
+
+    @Override
+    public void calculateTarget() {
+        if (getCurrentMode() == CHASEMODE) {
             if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION) {
                 setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
             } else {

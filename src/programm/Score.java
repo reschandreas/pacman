@@ -46,7 +46,6 @@ public class Score {
         long ret = this.score - score.score;
         if (ret == 0) {
             ret = name.compareTo(score.name);
-            System.out.println();
         }
         return ret;
     }
@@ -60,7 +59,7 @@ public class Score {
 
     @Override
     public String toString() {
-        return name + ";" + score;
+        return name + ";" + level + ";" + score;
     }
 
     @Override

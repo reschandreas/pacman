@@ -2,19 +2,12 @@ package programm;
 
 import net.gobbz.grundobjekte.*;
 import net.gobbz.spielobjekte.*;
-import sun.plugin.javascript.navig.Array;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.Arc2D;
-import java.sql.Time;
 import java.util.*;
-import java.util.List;
-import java.util.Timer;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -41,11 +34,12 @@ public class PacmanGUI extends JFrame {
     public static ArrayList<Ghost> ghosts = null;
     public static Pacman pacman = null;
 
-    private Thread moveThread;
-    private Thread ghostThread;
+    private Thread moveThread = null;
+    private Thread ghostThread = null;
 
     private Container container;
     private boolean caught = false;
+    private boolean paused = false;
 
     private JLabel l_scoretext;
     private JLabel l_score;
@@ -54,8 +48,13 @@ public class PacmanGUI extends JFrame {
     private JLabel l_level;
     private int level = 0;
 
-    private Timer wavetimer = null;
-    private Timer modestimer = null;
+    private Thread wavethread = null;
+
+    private long starttime;
+    private long fright_time;
+    private long pausedtime;
+    private long temptime;
+    private long delay = 0;
 
     private JFrame jFrame = null;
 
@@ -80,8 +79,6 @@ public class PacmanGUI extends JFrame {
         readDatas();
 
         drawMaze();
-
-        wavetimer = new Timer();
 
         l_scoretext = new JLabel("Score: ");
         l_scoretext.setBounds(0, 30, 50, 20);
@@ -133,7 +130,25 @@ public class PacmanGUI extends JFrame {
                            @Override
                            public void keyPressed(final KeyEvent e) {
                                switch (e.getKeyCode()) {
+                                   case KeyEvent.VK_P:
+                                       if (paused) {
+                                           paused = false;
+                                           moveThread.resume();
+                                           ghostThread.resume();
+                                           wavethread.resume();
+                                           pausedtime += System.currentTimeMillis() - temptime;
+                                       } else {
+                                           paused = true;
+                                           temptime = System.currentTimeMillis();
+                                           moveThread.suspend();
+                                           ghostThread.suspend();
+                                           wavethread.suspend();
+                                       }
+                                       break;
                                    case KeyEvent.VK_ESCAPE:
+                                       ghostThread.interrupt();
+                                       moveThread.interrupt();
+                                       wavethread.interrupt();
                                        new MenuGUI();
                                        jFrame.dispose();
                                        break;
@@ -141,7 +156,12 @@ public class PacmanGUI extends JFrame {
                                        System.out.println(getMousePosition().getX() + " " + getMousePosition().getY());
                                        break;
                                    }
-                                   case KeyEvent.VK_P: {
+                                   case KeyEvent.VK_I:
+                                       for (Intersection intersection : intersections) {
+                                           intersection.setVisible(!intersection.isVisible());
+                                       }
+                                       break;
+                                   case KeyEvent.VK_T: {
                                        for (Tile tile : tiles) {
                                            tile.setVisible(!tile.isVisible());
                                        }
@@ -198,30 +218,30 @@ public class PacmanGUI extends JFrame {
                 do {
                     while (!Thread.interrupted() && !dots.isEmpty() && !caught()) {
                         pacman.move();
-                        int row;
+                        int column;
                         boolean eaten = eatenDots();
                         if (!eaten) {
-                            row = 0;
-                        } else row = 1;
-                        if (!eaten && ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
-                            row = 2;
-                        if (eaten && ghosts.get(0).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
-                            row = 3;
+                            column = 0;
+                        } else column = 1;
+                        if (!eaten && ghosts.get(0).getCurrentMode() == Ghost.FRIGHTENEDMODE)
+                            column = 2;
+                        if (eaten && ghosts.get(0).getCurrentMode() == Ghost.FRIGHTENEDMODE)
+                            column = 3;
                         double tempspeed;
                         switch (level) {
                             case 1:
-                                tempspeed = (pacman.getSpeed() * speedlist[0][row]);
+                                tempspeed = (pacman.getSpeed() * speedlist[0][column]);
                                 break;
                             case 2:
                             case 3:
                             case 4:
-                                tempspeed = (pacman.getSpeed() * speedlist[1][row]);
+                                tempspeed = (pacman.getSpeed() * speedlist[1][column]);
                                 break;
                             default:
                                 if (level <= 20)
-                                    tempspeed = (pacman.getSpeed() * speedlist[2][row]);
+                                    tempspeed = (pacman.getSpeed() * speedlist[2][column]);
                                 else
-                                    tempspeed = (pacman.getSpeed() * speedlist[3][row]);
+                                    tempspeed = (pacman.getSpeed() * speedlist[3][column]);
                                 break;
                         }
                         long speedms = (long) tempspeed;
@@ -249,33 +269,6 @@ public class PacmanGUI extends JFrame {
         });
         moveThread.start();
 
-        addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println((int) getMousePosition().getX() + ";" + (int) getMousePosition().getY());
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
-
         ghostThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -292,14 +285,31 @@ public class PacmanGUI extends JFrame {
                             if (ghosts.get(i) instanceof Pinky) {
                                 ghosts.get(i).move();
                             }
-                            if (ghosts.get(i) instanceof Inky && dots.size() <= 242 - 30) {
-                                ghosts.get(i).move();
+                            if (ghosts.get(i) instanceof Inky) {
+                                if (dots.size() <= 242 - 30) {
+                                    if (ghosts.get(i).isInsidehouse()) {
+                                        ghosts.get(i).setTarget(Ghost.targetinhouse);
+                                    } else if (ghosts.get(i).getTarget()[0] == Ghost.targetouthouse[0] &&
+                                            ghosts.get(i).getTarget()[1] == Ghost.targetouthouse[1]) {
+                                        ghosts.get(i).calculateTarget();
+                                    }
+                                    ghosts.get(i).move();
+                                }
                             }
-                            if (ghosts.get(i) instanceof Clyde && dots.size() <= 242 - 80) {
-                                ghosts.get(i).move();
+                            if (ghosts.get(i) instanceof Clyde)
+                                if (dots.size() <= 242 - 80) {
+                                    if (ghosts.get(i).isInsidehouse()) {
+                                        ghosts.get(i).setTarget(Ghost.targetouthouse);
+                                    } else if (ghosts.get(i).getTarget()[0] == Ghost.targetouthouse[0] &&
+                                            ghosts.get(i).getTarget()[1] == Ghost.targetouthouse[1]) {
+                                        ghosts.get(i).calculateTarget();
+                                    }
+                                    ghosts.get(i).move();
+                                }
+                            for (Ghost ghost : ghosts) {
+                                if (ghost.getCurrentMode() == Ghost.FRIGHTENEDMODE)
+                                    row = 5;
                             }
-                            if (ghosts.get(i).getCurrent_mode() == Ghost.FRIGHTENEDMODE)
-                                row = 5;
                         }
                         switch (level) {
                             case 1:
@@ -325,17 +335,13 @@ public class PacmanGUI extends JFrame {
                         } catch (InterruptedException ignored) {
                         }
                     }
-                    if (dots.isEmpty())
-                        nextLevel();
-                    else {
+                    if (!dots.isEmpty()) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        continueLevel();
                     }
-                    drawMaze();
                 } while (!Thread.interrupted() && pacman.getLives() > 0);
             }
         }
@@ -343,7 +349,85 @@ public class PacmanGUI extends JFrame {
         );
         ghostThread.start();
         newGame();
+        wavethread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.interrupted() && pacman.getLives() > 0) {
+                    if (ghosts.get(0).getCurrentMode() == Ghost.FRIGHTENEDMODE) {
+                        if (fright_time != 0) {
+                            if (System.currentTimeMillis() - fright_time - pausedtime > 7000) {
+                                for (Ghost ghost : ghosts) {
+                                    ghost.modes(ghost.getPrev_mode());
+                                }
+                                fright_time = 0;
+                            }
+                        }
+
+                    } else if (fright_time == 0) {
+                        long gametime = System.currentTimeMillis() - starttime - pausedtime;
+                        int row = 0;
+                        switch (level) {
+                            case 1:
+                                row = 0;
+                                break;
+                            case 2:
+                                row = 1;
+                                break;
+                            case 3:
+                            case 4:
+                            case 5:
+                                row = 2;
+                                break;
+                            default:
+                                if (level <= 20) {
+                                    row = 3;
+                                } else {
+                                    row = 4;
+                                }
+                        }
+                        int mode = 0;
+                        int prev = ghosts.get(0).getCurrentMode();
+                        long sum = (wavelist[row][0] == -1 ? Long.MAX_VALUE : wavelist[row][0]) - delay;
+                        if (gametime > sum) {
+                            mode = Ghost.CHASEMODE;
+                        }
+                        sum += (wavelist[row][1] == -1 ? Long.MAX_VALUE : wavelist[row][1]);
+                        if (gametime >= sum) {
+                            mode = Ghost.SCATTERMODE;
+                        }
+                        sum += (wavelist[row][2] == -1 ? Long.MAX_VALUE : wavelist[row][2]);
+                        if (gametime >= sum) {
+                            mode = Ghost.CHASEMODE;
+                        }
+                        sum += (wavelist[row][3] == -1 ? Long.MAX_VALUE : wavelist[row][3]);
+                        if (gametime >= sum) {
+                            mode = Ghost.SCATTERMODE;
+                        }
+                        sum += (wavelist[row][4] == -1 ? Long.MAX_VALUE : wavelist[row][4]);
+                        if (gametime >= sum) {
+                            mode = Ghost.CHASEMODE;
+                        }
+                        sum += (wavelist[row][5] == -1 ? Long.MAX_VALUE : wavelist[row][5]);
+                        if (gametime >= sum) {
+                            mode = Ghost.SCATTERMODE;
+                        }
+                        sum += (wavelist[row][6] == -1 ? Long.MAX_VALUE : wavelist[row][6]);
+                        if (gametime >= sum) {
+                            mode = Ghost.CHASEMODE;
+                        }
+                        for (Ghost ghost : ghosts) {
+                            ghost.modes(mode);
+                        }
+                    }
+                }
+            }
+        }
+
+        );
+        wavethread.start();
+
         setVisible(true);
+
     }
 
     private void newGame() {
@@ -361,9 +445,9 @@ public class PacmanGUI extends JFrame {
 
     private void continueLevel() {
         for (Ghost ghost : ghosts) {
-            ghost.reStart();
+            ghost.start();
         }
-        pacman.reStart();
+        pacman.start();
         caught = false;
     }
 
@@ -371,7 +455,8 @@ public class PacmanGUI extends JFrame {
         for (Ghost ghost : ghosts) {
             if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY())
                 if (ghost.isEatable()) {
-                    ghost.reStart();
+                    ghost.modes(ghost.getPrev_mode());
+                    ghost.resume();
                 } else {
                     if (!caught) {
                         pacman.deductLife();
@@ -385,78 +470,16 @@ public class PacmanGUI extends JFrame {
     }
 
     private void nextLevel() {
-        if (level != playerlevel) {
-            level++;
-            l_level.setText(String.valueOf(level));
-            playerlevel = level;
-        }
+        starttime = System.currentTimeMillis();
+        level++;
+        pausedtime = 0;
+        l_level.setText(String.valueOf(level));
+        playerlevel = level;
         for (Ghost ghost : ghosts) {
-            ghost.reStart();
-            ghost.setCurrent_mode(Ghost.SCATTERMODE);
+            ghost.start();
+            ghost.modes(Ghost.SCATTERMODE);
         }
-        final int row;
-        switch (level) {
-            case 1: {
-                row = 0;
-                break;
-            }
-            case 2:
-            case 3:
-            case 4:
-                row = 1;
-                break;
-            default:
-                if (level <= 20)
-                    row = 3;
-                else
-                    row = 4;
-                break;
-        }
-        for (final Ghost ghost : ghosts) {
-            wavetimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    ghost.setCurrent_mode(Ghost.CHASEMODE);
-                    wavetimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            ghost.setCurrent_mode(Ghost.SCATTERMODE);
-                            wavetimer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    ghost.setCurrent_mode(Ghost.CHASEMODE);
-                                    wavetimer.schedule(new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            ghost.setCurrent_mode(Ghost.SCATTERMODE);
-                                            wavetimer.schedule(new TimerTask() {
-                                                @Override
-                                                public void run() {
-                                                    ghost.setCurrent_mode(Ghost.CHASEMODE);
-                                                    wavetimer.schedule(new TimerTask() {
-                                                        @Override
-                                                        public void run() {
-                                                            ghost.setCurrent_mode(Ghost.SCATTERMODE);
-                                                            wavetimer.schedule(new TimerTask() {
-                                                                @Override
-                                                                public void run() {
-                                                                    ghost.setCurrent_mode(Ghost.CHASEMODE);
-                                                                }
-                                                            }, (long) wavelist[row][6] == -1 ? Integer.MAX_VALUE : wavelist[row][6]);
-                                                        }
-                                                    }, (long) wavelist[row][5] == -1 ? Integer.MAX_VALUE : wavelist[row][5]);
-                                                }
-                                            }, (long) wavelist[row][4] == -1 ? Integer.MAX_VALUE : wavelist[row][4]);
-                                        }
-                                    }, (long) wavelist[row][3] == -1 ? Integer.MAX_VALUE : wavelist[row][3]);
-                                }
-                            }, (long) wavelist[row][2] == -1 ? Integer.MAX_VALUE : wavelist[row][2]);
-                        }
-                    }, (long) wavelist[row][1] == -1 ? Integer.MAX_VALUE : wavelist[row][1]);
-                }
-            }, (long) wavelist[row][row] == -1 ? Integer.MAX_VALUE : wavelist[row][0]);
-        }
-        pacman.reStart();
+        pacman.start();
     }
 
     private boolean eatenDots() {
@@ -468,9 +491,13 @@ public class PacmanGUI extends JFrame {
                     if (pacman.getRealX() - 2 == dots.get(i).getX() && pacman.getRealY() - 2 == dots.get(i).getY()
                             || pacman.getRealX() - 8 == dots.get(i).getX() && pacman.getRealY() - 8 == dots.get(i).getY()) {
                         if (dots.get(i) instanceof Energizer) {
+                            delay += 7000;
+                            fright_time = System.currentTimeMillis();
                             for (Ghost ghost : ghosts) {
-                                if (ghost.getCurrent_mode() != Ghost.FRIGHTENEDMODE)
+                                if (ghost.getCurrentMode() != Ghost.FRIGHTENEDMODE) {
                                     ghost.modes(Ghost.FRIGHTENEDMODE);
+                                    ghost.repaint();
+                                }
                             }
                         }
                         dots.get(i).die();
@@ -599,6 +626,10 @@ public class PacmanGUI extends JFrame {
         for (Component component : container.getComponents()) {
             component.repaint();
         }
+        for (Ghost ghost : ghosts) {
+            ghost.repaint();
+        }
+        pacman.repaint();
         for (Wall wall : lifelist) {
             wall.setVisible(false);
         }
