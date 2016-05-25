@@ -48,10 +48,6 @@ public class Dot extends JComponent {
         return points;
     }
 
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
     /**
      * Methode, welche automatisch aufgerufen wird und das Bild in der Größe des Objektes
      * darstellt
@@ -71,29 +67,5 @@ public class Dot extends JComponent {
             this.getParent().remove(this);
             this.dead = true;
         }
-    }
-
-    public boolean isDead() {
-        return dead;
-    }
-
-    public void setDead(boolean dead) {
-        this.dead = dead;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
-    }
-
-    public String getImage_path() {
-        return image_path;
-    }
-
-    public void setImage_path(String image_path) {
-        this.image_path = image_path;
     }
 }

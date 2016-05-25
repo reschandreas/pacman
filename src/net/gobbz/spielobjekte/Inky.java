@@ -12,8 +12,6 @@ public class Inky extends Ghost {
         super("ghost_blue.png", "ghost_frightened.png");
         startpos[0] = 176;
         startpos[1] = 268;
-/*        startpos[0] = 208;
-        startpos[1] = 216;*/
         setLocation(startpos[0], startpos[1]);
         target[0] = 432;
         target[1] = 560;

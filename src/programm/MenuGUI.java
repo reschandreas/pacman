@@ -23,9 +23,7 @@ public class MenuGUI extends JFrame {
     private final Container container;
     private final Pacman pacman;
     private final ArrayList<Ghost> ghosts = new ArrayList<>();
-    public static ArrayList<Score> highscores = new ArrayList<>();
-    private String name;
-    private long score;
+    static ArrayList<Score> highscores = new ArrayList<>();
 
     private JTextField tf_name = null;
 

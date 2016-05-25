@@ -83,10 +83,6 @@ public abstract class Ghost extends Pacman {
         return insidehouse;
     }
 
-    public void setInsidehouse(boolean insidehouse) {
-        this.insidehouse = insidehouse;
-    }
-
     @Override
     public void start() {
         setLocation(startpos[0], startpos[1]);
@@ -338,32 +334,8 @@ public abstract class Ghost extends Pacman {
         return current_mode;
     }
 
-    public void setCurrent_mode(int current_mode) {
-        this.current_mode = current_mode;
-    }
-
-    public Image getImage_frightened() {
-        return image_frightened;
-    }
-
-    public void setImage_frightened(Image image_frightened) {
-        this.image_frightened = image_frightened;
-    }
-
-    public Image getImage_normal() {
-        return image_normal;
-    }
-
-    public void setImage_normal(Image image_normal) {
-        this.image_normal = image_normal;
-    }
-
     public int getPrev_mode() {
         return prev_mode;
-    }
-
-    public void setPrev_mode(int prev_mode) {
-        this.prev_mode = prev_mode;
     }
 
     public void setTarget(int[] target) {
@@ -376,10 +348,6 @@ public abstract class Ghost extends Pacman {
 
     public void setCurrent_target(int[] current_target) {
         this.current_target = current_target;
-    }
-
-    public int[] getCurrent_target() {
-        return current_target;
     }
 
     protected int pythagoras(int targetx, int targety, int startx, int starty) {

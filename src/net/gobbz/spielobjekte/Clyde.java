@@ -9,12 +9,8 @@ public class Clyde extends Ghost {
 
     public Clyde() {
         super("ghost_orange.png", "ghost_frightened.png");
-/*        startpos[0] = 176;
-        startpos[1] = 268;*/
         startpos[0] = 240;
         startpos[1] = 268;
-/*        startpos[0] = 208;
-        startpos[1] = 216;*/
         setLocation(startpos[0], startpos[1]);
         target[0] = 0;
         target[1] = 560;

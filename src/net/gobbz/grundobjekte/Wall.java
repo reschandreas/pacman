@@ -15,9 +15,7 @@ import java.net.URL;
 public class Wall extends JComponent {
 
     protected Image image = null;
-    protected String image_path = null;
-
-    protected boolean dead = false;
+    private String image_path = null;
 
     public Wall(String path) {
         image_path = path;
@@ -63,38 +61,7 @@ public class Wall extends JComponent {
         }
     }
 
-    /**
-     * Objekt stirbt, indem es sich selbständig vom contentPane des Formulars entfernt.
-     * Dadurch wird das Objekt auch nicht mehr angezeigt
-     */
-    public void die() {
-        if (!this.dead && this.getParent() != null) {
-            this.getParent().remove(this);
-            this.dead = true;
-        }
-    }
-
-    public boolean isDead() {
-        return dead;
-    }
-
-    public void setDead(boolean dead) {
-        this.dead = dead;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
     public void setImage(Image image) {
         this.image = image;
-    }
-
-    public String getImage_path() {
-        return image_path;
-    }
-
-    public void setImage_path(String image_path) {
-        this.image_path = image_path;
     }
 }

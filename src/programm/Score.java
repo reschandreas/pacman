@@ -22,10 +22,6 @@ public class Score {
         return score;
     }
 
-    public void setScore(long score) {
-        this.score = score;
-    }
-
     public String getName() {
         return name;
     }

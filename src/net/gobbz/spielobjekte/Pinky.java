@@ -12,10 +12,6 @@ public class Pinky extends Ghost {
         super("ghost_pink.png", "ghost_frightened.png");
         startpos[0] = 240;
         startpos[1] = 268;
-/*        startpos[0] = 208;
-        startpos[1] = 268;*/
-/*        startpos[0] = 208;
-        startpos[1] = 216;*/
         setLocation(startpos[0], startpos[1]);
         target[0] = 32;
         target[1] = 0;
