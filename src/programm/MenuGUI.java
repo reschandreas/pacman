@@ -1,7 +1,6 @@
 package programm;
 
 import net.gobbz.spielobjekte.*;
-import sun.plugin.javascript.navig.Array;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,8 +10,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
 
 /**
  * Created by Andreas on 15.05.16.
