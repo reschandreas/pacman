@@ -9,7 +9,7 @@ import io.resch.pacman.gui.*;
 public class Blinky extends Ghost {
 
     public Blinky() {
-        super("ghost_red.png", "ghost_frightened.png");
+        super("images/ghost_red.png", "images/ghost_frightened.png");
         insidehouse = false;
         startpos[0] = 208;
         startpos[1] = 216;

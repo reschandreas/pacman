@@ -1,7 +1,10 @@
 package io.resch.pacman.movable;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -15,7 +18,7 @@ public class Dot extends JComponent {
 
     protected boolean dead = false;
 
-    public Dot( String path, int x, int y) {
+    public Dot(String path, int x, int y) {
         this(path);
         points = 10;
         setLocation(x, y);
@@ -23,21 +26,16 @@ public class Dot extends JComponent {
 
     public Dot(String path) {
         image_path = path;
-        URL url = this.getClass().getResource(path);
-        if (url == null)
-            System.out.println("File not Found");
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream input = classLoader.getResourceAsStream(path);
+
+        if (input == null)
+            System.out.println("Dot file not Found");
         else {
-            image = getToolkit().getImage(url);
-            prepareImage(image, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                image = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             // Stelle Größe des Objektes auf Größe des Bildes ein
             this.setSize(this.image.getWidth(this), this.image.getHeight(this));

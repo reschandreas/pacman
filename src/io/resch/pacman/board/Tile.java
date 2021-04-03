@@ -1,6 +1,5 @@
 package io.resch.pacman.board;
 
-
 import io.resch.pacman.gui.*;
 import javax.swing.*;
 import java.awt.*;

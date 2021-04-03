@@ -9,7 +9,7 @@ import io.resch.pacman.gui.*;
 public class Inky extends Ghost {
 
     public Inky() {
-        super("ghost_blue.png", "ghost_frightened.png");
+        super("images/ghost_blue.png", "images/ghost_frightened.png");
         startpos[0] = 176;
         startpos[1] = 268;
         setLocation(startpos[0], startpos[1]);

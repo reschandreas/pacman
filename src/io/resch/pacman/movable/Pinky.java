@@ -9,7 +9,7 @@ import io.resch.pacman.gui.*;
 public class Pinky extends Ghost {
 
     public Pinky() {
-        super("ghost_pink.png", "ghost_frightened.png");
+        super("images/ghost_pink.png", "images/ghost_frightened.png");
         startpos[0] = 240;
         startpos[1] = 268;
         setLocation(startpos[0], startpos[1]);

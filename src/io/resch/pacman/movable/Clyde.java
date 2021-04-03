@@ -8,7 +8,7 @@ import io.resch.pacman.gui.*;
 public class Clyde extends Ghost {
 
     public Clyde() {
-        super("ghost_orange.png", "ghost_frightened.png");
+        super("images/ghost_orange.png", "images/ghost_frightened.png");
         startpos[0] = 240;
         startpos[1] = 268;
         setLocation(startpos[0], startpos[1]);

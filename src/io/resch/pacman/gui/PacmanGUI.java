@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -101,7 +102,7 @@ public class PacmanGUI extends JFrame {
         container.add(l_level);
 
         for (int i = 0; i < 3; i++) {
-            Wall wall = new Wall("pacman_right.png");
+            Wall wall = new Wall("images/wall_right.png");
             wall.setLocation(i * 32, 544);
             lifelist.add(wall);
             container.add(lifelist.get(i));
@@ -516,7 +517,12 @@ public class PacmanGUI extends JFrame {
 
     private void readDatas() {
         int i = 0;
-        Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("waves.data")).useDelimiter("\\n");
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream input = classLoader.getResourceAsStream("data/waves.data");
+        if (input == null) {
+            return;
+        }
+        Scanner reader = new Scanner(input).useDelimiter("\\n");
         while (true) {
             String line = reader.hasNext() ? reader.next() : "";
             if (line == null || line.isEmpty())
@@ -533,7 +539,11 @@ public class PacmanGUI extends JFrame {
             }
         }
 
-        reader = new Scanner(PacmanGUI.class.getResourceAsStream("speeds.data")).useDelimiter("\\n");
+        input = classLoader.getResourceAsStream("data/speeds.data");
+        if (input == null) {
+            return;
+        }
+        reader = new Scanner(input).useDelimiter("\\n");
         i = 0;
         while (true) {
             String line = reader.hasNext() ? reader.next() : "";
@@ -555,7 +565,12 @@ public class PacmanGUI extends JFrame {
     private void drawMaze() {
         if (walls.isEmpty()) {
             //Zeichne Mauern aus der Datei maze.data*/
-            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("maze.data")).useDelimiter("\\n");
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            InputStream input = classLoader.getResourceAsStream("data/maze.data");
+            if (input == null) {
+                return;
+            }
+            Scanner reader = new Scanner(input).useDelimiter("\\n");
             while (true) {
                 String line = reader.hasNext() ? reader.next() : "";
                 if (line == null || line.isEmpty())
@@ -563,7 +578,7 @@ public class PacmanGUI extends JFrame {
                     break;
                 else {
                     String[] strings = line.split(";");
-                    Wall wall = new Wall(strings[0]);
+                    Wall wall = new Wall("images/" + strings[0]);
                     wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
                     container.add(wall);
                     walls.add(wall);
@@ -572,7 +587,12 @@ public class PacmanGUI extends JFrame {
             reader.close();
         }
         if (intersections.isEmpty()) {
-            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("intersections.data")).useDelimiter("\\n");
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            InputStream input = classLoader.getResourceAsStream("data/intersections.data");
+            if (input == null) {
+                return;
+            }
+            Scanner reader = new Scanner(input).useDelimiter("\\n");
             while (true) {
                 String line = reader.hasNext() ? reader.next() : "";
                 if (line == null || line.isEmpty())
@@ -589,7 +609,12 @@ public class PacmanGUI extends JFrame {
         }
 
         if (dots.isEmpty()) {
-            Scanner reader = new Scanner(PacmanGUI.class.getResourceAsStream("dots.data")).useDelimiter("\\n");
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            InputStream input = classLoader.getResourceAsStream("data/dots.data");
+            if (input == null) {
+                return;
+            }
+            Scanner reader = new Scanner(input).useDelimiter("\\n");
             while (true) {
                 String line = reader.hasNext() ? reader.next() : "";
                 if (line == null || line.isEmpty())
@@ -599,9 +624,9 @@ public class PacmanGUI extends JFrame {
                     String[] strings = line.split(";");
                     Dot dot;
                     if (strings[0].equals("energizer.png")) {
-                        dot = new Energizer(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                        dot = new Energizer("images/" + strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
                     } else
-                        dot = new Dot(strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
+                        dot = new Dot("images/" + strings[0], Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
                     container.add(dot);
                     dots.add(dot);
                 }

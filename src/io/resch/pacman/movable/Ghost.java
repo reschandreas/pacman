@@ -2,7 +2,10 @@ package io.resch.pacman.movable;
 
 import io.resch.pacman.board.*;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Random;
 
@@ -42,38 +45,26 @@ public abstract class Ghost extends Pacman {
 
     public Ghost(String path, String frightened) {
         this(path);
-        URL url = this.getClass().getResource(path);
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream input = classLoader.getResourceAsStream(path);
+
+        if (input == null)
+            System.out.println("Ghost file not found --- " + path);
         else {
-            this.image_normal = getToolkit().getImage(url);
-            prepareImage(image_normal, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_normal, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_normal = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        url = this.getClass().getResource(frightened);
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        input = classLoader.getResourceAsStream(frightened);
+        if (input == null)
+            System.out.println("Ghost file not found --- " + path);
         else {
-            this.image_frightened = getToolkit().getImage(url);
-            prepareImage(image_frightened, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_frightened, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_frightened = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

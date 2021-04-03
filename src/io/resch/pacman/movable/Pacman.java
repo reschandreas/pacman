@@ -5,7 +5,10 @@ import io.resch.pacman.board.Wall;
 import io.resch.pacman.board.*;
 import io.resch.pacman.gui.*;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -46,73 +49,51 @@ public class Pacman extends Wall {
     }
 
     public Pacman() {
-        this("pacman_left.png");
-        URL url = this.getClass().getResource("pacman_up.png");
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        this("images/pacman_left.png");
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream input = classLoader.getResourceAsStream("images/pacman_up.png");
+
+        if (input == null)
+            System.out.println("Pacman file not Found --- images/pacman_up.png");
         else {
-            this.image_up = getToolkit().getImage(url);
-            prepareImage(image_up, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_up, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_up = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        url = this.getClass().getResource("pacman_down.png");
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        input = classLoader.getResourceAsStream("images/pacman_down.png");
+
+        if (input == null)
+            System.out.println("Pacman file not Found --- images/pacman_down.png");
         else {
-            this.image_down = getToolkit().getImage(url);
-            prepareImage(image_down, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_down, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_down = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        url = this.getClass().getResource("pacman_left.png");
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        input = classLoader.getResourceAsStream("images/pacman_left.png");
+
+        if (input == null)
+            System.out.println("Pacman file not Found --- images/pacman_left.png");
         else {
-            this.image_left = getToolkit().getImage(url);
-            prepareImage(image_left, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_left, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_left = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
         }
-        url = this.getClass().getResource("pacman_right.png");
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
+        input = classLoader.getResourceAsStream("images/pacman_right.png");
+
+        if (input == null)
+            System.out.println("Pacman file not Found --- images/pacman_right.png");
         else {
-            this.image_right = getToolkit().getImage(url);
-            prepareImage(image_right, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image_right, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                this.image_right = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

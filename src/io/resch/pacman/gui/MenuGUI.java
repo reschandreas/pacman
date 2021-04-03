@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -222,7 +223,12 @@ public class MenuGUI extends JFrame {
     private void readScores() {
         if (highscores.isEmpty()) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader("./scores.data"));
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                InputStream input = classLoader.getResourceAsStream("data/scores.data");
+                if (input == null) {
+                    return;
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
                 while (true) {
                     String line = reader.readLine();
                     if (line == null || line.isEmpty())

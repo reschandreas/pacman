@@ -1,7 +1,10 @@
 package io.resch.pacman.board;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -14,37 +17,23 @@ public class Wall extends JComponent {
 
     public Wall(String path) {
         image_path = path;
-/*
-        try {
-            image = ImageIO.read(new File(getClass().getResource(path).toURI()));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        // Stelle Größe des Objektes auf Größe des Bildes ein
-        this.setSize(this.image.getWidth(this), this.image.getHeight(this));
-*/
 
-        URL url = this.getClass().getResource(path);
-        if (url == null)
-            System.out.println("Datei nicht gefunden");
-        else {
-            this.image = getToolkit().getImage(url);
-            prepareImage(image, this);
-            Thread t = Thread.currentThread();
-            // Warte bis die Eigenschaften des Bildes geladen sind
-            while ((checkImage(image, this) & PROPERTIES) != PROPERTIES) {
-                try {
-                    // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
-                    Thread.sleep(50);
-                }
-                catch(InterruptedException e) {
-                    e.printStackTrace();
-                }
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream input = classLoader.getResourceAsStream(path);
+
+        if (input == null) {
+            System.out.println("file not found --- " + path);
+        } else {
+            try {
+                this.image = image = ImageIO.read(input);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             // Stelle Größe des Objektes auf Größe des Bildes ein
-            this.setSize(this.image.getWidth(this),this.image.getHeight(this));
+            this.setSize(this.image.getWidth(this), this.image.getHeight(this));
         }
     }
+
     /**
      * Methode, welche automatisch aufgerufen wird und das Bild in der Größe des Objektes
      * darstellt
