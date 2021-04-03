@@ -1,7 +1,7 @@
-package io.resch.pacman.programm;
+package io.resch.pacman.gui;
 
-import io.resch.pacman.grundobjekte.*;
-import io.resch.pacman.spielobjekte.*;
+import io.resch.pacman.board.*;
+import io.resch.pacman.movable.*;
 
 import javax.swing.*;
 import java.awt.*;

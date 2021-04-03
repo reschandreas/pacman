@@ -1,4 +1,4 @@
-package io.resch.pacman.programm;
+package io.resch.pacman.gui;
 
 /**
  * Created by Andreas on 16.05.16.

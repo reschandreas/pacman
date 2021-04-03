@@ -1,4 +1,4 @@
-package io.resch.pacman.spielobjekte;
+package io.resch.pacman.movable;
 
 /**
  * Created by Andreas on 16.04.16.

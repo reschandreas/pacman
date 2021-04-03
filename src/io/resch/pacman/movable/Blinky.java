@@ -1,6 +1,6 @@
-package io.resch.pacman.spielobjekte;
+package io.resch.pacman.movable;
 
-import io.resch.pacman.programm.*;
+import io.resch.pacman.gui.*;
 
 /**
  * Created by Andreas on 09.04.16.

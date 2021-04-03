@@ -1,16 +1,11 @@
-package io.resch.pacman.spielobjekte;
+package io.resch.pacman.movable;
 
-import io.resch.pacman.grundobjekte.Wall;
+import io.resch.pacman.board.Wall;
 
-import io.resch.pacman.grundobjekte.*;
-import io.resch.pacman.programm.*;
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import io.resch.pacman.board.*;
+import io.resch.pacman.gui.*;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 /**

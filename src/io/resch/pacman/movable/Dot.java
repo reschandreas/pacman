@@ -1,39 +1,33 @@
-package io.resch.pacman.grundobjekte;
+package io.resch.pacman.movable;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
  * Created by Andreas on 03.04.16.
  */
-public class Wall extends JComponent {
+public class Dot extends JComponent {
 
     protected Image image = null;
-    private String image_path = null;
+    protected String image_path = null;
+    protected int points;
 
-    public Wall(String path) {
+    protected boolean dead = false;
+
+    public Dot( String path, int x, int y) {
+        this(path);
+        points = 10;
+        setLocation(x, y);
+    }
+
+    public Dot(String path) {
         image_path = path;
-/*
-        try {
-            image = ImageIO.read(new File(getClass().getResource(path).toURI()));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        // Stelle Größe des Objektes auf Größe des Bildes ein
-        this.setSize(this.image.getWidth(this), this.image.getHeight(this));
-*/
-
         URL url = this.getClass().getResource(path);
         if (url == null)
-            System.out.println("Datei nicht gefunden");
+            System.out.println("File not Found");
         else {
-            this.image = getToolkit().getImage(url);
+            image = getToolkit().getImage(url);
             prepareImage(image, this);
             Thread t = Thread.currentThread();
             // Warte bis die Eigenschaften des Bildes geladen sind
@@ -41,27 +35,37 @@ public class Wall extends JComponent {
                 try {
                     // Pause, um dem Ladevorgang keine Ressourcen zu nehmen
                     Thread.sleep(50);
-                }
-                catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
             // Stelle Größe des Objektes auf Größe des Bildes ein
-            this.setSize(this.image.getWidth(this),this.image.getHeight(this));
+            this.setSize(this.image.getWidth(this), this.image.getHeight(this));
         }
     }
+
+    public int getPoints() {
+        return points;
+    }
+
     /**
      * Methode, welche automatisch aufgerufen wird und das Bild in der Größe des Objektes
      * darstellt
      */
-
     public void paint(Graphics g) {
         if (image != null) {
             g.drawImage(this.image, 0, 0, this);
         }
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    /**
+     * Objekt stirbt, indem es sich selbständig vom contentPane des Formulars entfernt.
+     * Dadurch wird das Objekt auch nicht mehr angezeigt
+     */
+    public void die() {
+        if (!this.dead && this.getParent() != null) {
+            this.getParent().remove(this);
+            this.dead = true;
+        }
     }
 }
