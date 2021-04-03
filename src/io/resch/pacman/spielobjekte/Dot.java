@@ -1,4 +1,4 @@
-package net.gobbz.spielobjekte;
+package io.resch.pacman.spielobjekte;
 
 import javax.swing.*;
 import java.awt.*;

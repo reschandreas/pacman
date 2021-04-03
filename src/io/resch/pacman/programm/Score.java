@@ -1,4 +1,4 @@
-package programm;
+package io.resch.pacman.programm;
 
 /**
  * Created by Andreas on 16.05.16.

@@ -1,6 +1,6 @@
-package net.gobbz.spielobjekte;
+package io.resch.pacman.spielobjekte;
 
-import programm.*;
+import io.resch.pacman.programm.*;
 
 /**
  * Created by Andreas on 09.04.16.

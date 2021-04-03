@@ -1,7 +1,7 @@
-package programm;
+package io.resch.pacman.programm;
 
-import net.gobbz.grundobjekte.*;
-import net.gobbz.spielobjekte.*;
+import io.resch.pacman.grundobjekte.*;
+import io.resch.pacman.spielobjekte.*;
 
 import javax.swing.*;
 import java.awt.*;

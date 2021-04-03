@@ -1,6 +1,6 @@
-package programm;
+package io.resch.pacman.programm;
 
-import net.gobbz.spielobjekte.*;
+import io.resch.pacman.spielobjekte.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -222,7 +222,7 @@ public class MenuGUI extends JFrame {
     private void readScores() {
         if (highscores.isEmpty()) {
             try {
-            BufferedReader reader = new BufferedReader(new FileReader("./scores.data"));
+                BufferedReader reader = new BufferedReader(new FileReader("./scores.data"));
                 while (true) {
                     String line = reader.readLine();
                     if (line == null || line.isEmpty())

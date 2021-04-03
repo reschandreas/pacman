@@ -1,4 +1,4 @@
-package net.gobbz.spielobjekte;
+package io.resch.pacman.spielobjekte;
 
 /**
  * Created by Andreas on 16.04.16.

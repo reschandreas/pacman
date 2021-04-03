@@ -1,9 +1,9 @@
-package net.gobbz.spielobjekte;
+package io.resch.pacman.spielobjekte;
 
-import net.gobbz.grundobjekte.Wall;
+import io.resch.pacman.grundobjekte.Wall;
 
-import net.gobbz.grundobjekte.*;
-import programm.*;
+import io.resch.pacman.grundobjekte.*;
+import io.resch.pacman.programm.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;

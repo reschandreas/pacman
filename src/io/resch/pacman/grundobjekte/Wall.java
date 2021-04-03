@@ -1,4 +1,4 @@
-package net.gobbz.grundobjekte;
+package io.resch.pacman.grundobjekte;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

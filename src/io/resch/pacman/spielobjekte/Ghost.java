@@ -1,7 +1,7 @@
-package net.gobbz.spielobjekte;
+package io.resch.pacman.spielobjekte;
 
-import net.gobbz.grundobjekte.*;
-import programm.PacmanGUI;
+import io.resch.pacman.grundobjekte.*;
+import io.resch.pacman.programm.PacmanGUI;
 
 import java.awt.*;
 import java.net.URL;
