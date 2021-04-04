@@ -1,6 +1,8 @@
 package io.resch.pacman.movable;
 
 import io.resch.pacman.gui.*;
+import io.resch.pacman.utils.Utils;
+
 /**
  * Created by Andreas on 09.04.16.
  * Orange Ghost
@@ -30,7 +32,7 @@ public class Clyde extends Ghost {
     @Override
     public void calculateTarget() {
         if (getCurrentMode() == Mode.CHASE) {
-            if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION) {
+            if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * Utils.RESOLUTION) {
                 setCurrentTarget(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
             } else {
                 setCurrentTarget(target);

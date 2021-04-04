@@ -4,6 +4,7 @@ import io.resch.pacman.board.BoardItem;
 import io.resch.pacman.board.Intersection;
 import io.resch.pacman.board.Wall;
 import io.resch.pacman.gui.PacmanGUI;
+import io.resch.pacman.utils.Utils;
 
 import java.awt.*;
 
@@ -70,7 +71,7 @@ public class MovableBoardItem extends BoardItem {
         if (x_speed == 1 || x_speed == -1) {
             if (x_speed == -1 && getX() < 0) {
                 setLocation(getParent().getWidth(), getY());
-            } else if (x_speed == 1 && getX() + getWidth() + x_speed > PacmanGUI.WIDTH) {
+            } else if (x_speed == 1 && getX() + getWidth() + x_speed > Utils.WIDTH) {
                 setLocation(x_speed, getY());
             } else if (!(getObjektBei(getX() + x_speed, getY()) instanceof Wall)) {
                 setLocation(getX() + x_speed, getY());
@@ -136,5 +137,9 @@ public class MovableBoardItem extends BoardItem {
 
     public int getRealY() {
         return getY() + getHeight() / 2;
+    }
+
+    public Point getLocation() {
+        return new Point(getX(), getY());
     }
 }

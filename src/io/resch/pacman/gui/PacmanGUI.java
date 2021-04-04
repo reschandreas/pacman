@@ -2,6 +2,7 @@ package io.resch.pacman.gui;
 
 import io.resch.pacman.board.*;
 import io.resch.pacman.movable.*;
+import io.resch.pacman.utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,21 +11,17 @@ import java.awt.event.KeyListener;
 import java.io.InputStream;
 import java.util.*;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Created by Andreas on 03.04.16.
  */
 public class PacmanGUI extends JFrame {
 
-    public static final int RESOLUTION = 16;
-
-    public static final int WIDTH = 28 * RESOLUTION;
-    public static final int HEIGHT = 36 * RESOLUTION;
     public static String playername = null;
     public static long playerpoints;
     public static int playerlevel = -1;
 
-    private final int[][] wavelist = new int[5][8];
     private final double[][] speedlist = new double[4][7];
 
     private final List<Wall> lifelist = new ArrayList<>();
@@ -61,7 +58,7 @@ public class PacmanGUI extends JFrame {
     public PacmanGUI() {
         super("Pacman");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setBounds(0, 0, WIDTH, HEIGHT);
+        setBounds(0, 0, Utils.WIDTH, Utils.HEIGHT);
         setUndecorated(true);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -169,19 +166,19 @@ public class PacmanGUI extends JFrame {
                                    }
                                    case KeyEvent.VK_R: {
                                        for (Ghost ghost : ghosts) {
-                                           ghost.modes(Ghost.Mode.SCATTER);
+                                           ghost.changeModeTo(Ghost.Mode.SCATTER);
                                        }
                                        break;
                                    }
                                    case KeyEvent.VK_F: {
                                        for (Ghost ghost : ghosts) {
-                                           ghost.modes(Ghost.Mode.FRIGHTENED);
+                                           ghost.changeModeTo(Ghost.Mode.FRIGHTENED);
                                        }
                                        break;
                                    }
                                    case KeyEvent.VK_C: {
                                        for (Ghost ghost : ghosts) {
-                                           ghost.modes(Ghost.Mode.CHASE);
+                                           ghost.changeModeTo(Ghost.Mode.CHASE);
                                        }
                                        break;
                                    }
@@ -351,65 +348,17 @@ public class PacmanGUI extends JFrame {
                     if (fright_time != 0) {
                         if (System.currentTimeMillis() - fright_time - pausedtime > 7000) {
                             for (Ghost ghost : ghosts) {
-                                ghost.modes(ghost.getPrev_mode());
+                                ghost.changeModeTo(ghost.getPrev_mode());
                             }
                             fright_time = 0;
                         }
                     }
 
                 } else if (fright_time == 0) {
-                    long gametime = System.currentTimeMillis() - starttime - pausedtime;
-                    int row = 0;
-                    switch (level) {
-                        case 1:
-                            break;
-                        case 2:
-                            row = 1;
-                            break;
-                        case 3:
-                        case 4:
-                        case 5:
-                            row = 2;
-                            break;
-                        default:
-                            if (level <= 20) {
-                                row = 3;
-                            } else {
-                                row = 4;
-                            }
-                    }
-                    Ghost.Mode mode = Ghost.Mode.SCATTER;
-                    long sum = (wavelist[row][0] == -1 ? Long.MAX_VALUE : wavelist[row][0]) - delay;
-                    if (gametime > sum) {
-                        mode = Ghost.Mode.CHASE;
-                    }
-                    sum += (wavelist[row][1] == -1 ? Long.MAX_VALUE : wavelist[row][1]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.SCATTER;
-                    }
-                    sum += (wavelist[row][2] == -1 ? Long.MAX_VALUE : wavelist[row][2]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.CHASE;
-                    }
-                    sum += (wavelist[row][3] == -1 ? Long.MAX_VALUE : wavelist[row][3]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.SCATTER;
-                    }
-                    sum += (wavelist[row][4] == -1 ? Long.MAX_VALUE : wavelist[row][4]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.CHASE;
-                    }
-                    sum += (wavelist[row][5] == -1 ? Long.MAX_VALUE : wavelist[row][5]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.SCATTER;
-                    }
-                    sum += (wavelist[row][6] == -1 ? Long.MAX_VALUE : wavelist[row][6]);
-                    if (gametime >= sum) {
-                        mode = Ghost.Mode.CHASE;
-                    }
-                    for (Ghost ghost : ghosts) {
-                        ghost.modes(mode);
-                    }
+                    Difficulties
+                            .getCurrentDifficulty(level)
+                            .getCurrentWave(System.currentTimeMillis() - starttime - pausedtime - delay)
+                            .setModes(ghosts);
                 }
             }
         }
@@ -445,7 +394,7 @@ public class PacmanGUI extends JFrame {
         for (Ghost ghost : ghosts) {
             if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY())
                 if (ghost.isEatable()) {
-                    ghost.modes(ghost.getPrev_mode());
+                    ghost.changeModeTo(ghost.getPrev_mode());
                     ghost.resume();
                 } else {
                     if (!caught) {
@@ -467,7 +416,7 @@ public class PacmanGUI extends JFrame {
         playerlevel = level;
         for (Ghost ghost : ghosts) {
             ghost.start();
-            ghost.modes(Ghost.Mode.SCATTER);
+            ghost.changeModeTo(Ghost.Mode.SCATTER);
         }
         pacman.start();
     }
@@ -483,7 +432,7 @@ public class PacmanGUI extends JFrame {
                         fright_time = System.currentTimeMillis();
                         for (Ghost ghost : ghosts) {
                             if (ghost.getCurrentMode() != Ghost.Mode.FRIGHTENED) {
-                                ghost.modes(Ghost.Mode.FRIGHTENED);
+                                ghost.changeModeTo(Ghost.Mode.FRIGHTENED);
                                 ghost.repaint();
                             }
                         }
@@ -502,30 +451,14 @@ public class PacmanGUI extends JFrame {
     }
 
     private void readDatas() {
-        int i = 0;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream("data/waves.data");
+        InputStream input = classLoader.getResourceAsStream("data/speeds.data");
         if (input == null) {
             return;
         }
         Scanner reader = new Scanner(input).useDelimiter("\\n");
+        int i = 0;
         String line;
-        while (!(line = reader.hasNext() ? reader.next() : "").isEmpty()) {
-            String[] strings = line.split(";");
-            int j = 0;
-            for (String s : strings) {
-                wavelist[i][j] = Integer.parseInt(s);
-                j++;
-            }
-            i++;
-        }
-
-        input = classLoader.getResourceAsStream("data/speeds.data");
-        if (input == null) {
-            return;
-        }
-        reader = new Scanner(input).useDelimiter("\\n");
-        i = 0;
         while (!(line = reader.hasNext() ? reader.next() : "").isEmpty()) {
             String[] strings = line.split(";");
             int j = 0;
@@ -539,7 +472,6 @@ public class PacmanGUI extends JFrame {
 
     private void drawMaze() {
         if (walls.isEmpty()) {
-            //Zeichne Mauern aus der Datei maze.data*/
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             InputStream input = classLoader.getResourceAsStream("data/maze.data");
             if (input == null) {
@@ -586,8 +518,8 @@ public class PacmanGUI extends JFrame {
         }
 
         if (tiles.isEmpty()) {
-            for (int i = 0; i < WIDTH; i += RESOLUTION) {
-                for (int j = 0; j < HEIGHT; j += RESOLUTION) {
+            for (int i = 0; i < Utils.WIDTH; i += Utils.RESOLUTION) {
+                for (int j = 0; j < Utils.HEIGHT; j += Utils.RESOLUTION) {
                     Tile tile = new Tile(new Point(i, j));
                     tiles.add(tile);
                     container.add(tile);
@@ -596,23 +528,13 @@ public class PacmanGUI extends JFrame {
         }
     }
 
+    private void resetGameAfterBeingEaten() {
+        IntStream.range(0, lifelist.size()).forEach(i -> lifelist.get(i).setVisible(i < pacman.getLives()));
+    }
+
     @Override
     public void paint(Graphics g) {
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        for (Component component : container.getComponents()) {
-            component.repaint();
-        }
-        for (Ghost ghost : ghosts) {
-            ghost.repaint();
-        }
-        pacman.repaint();
-        for (Wall wall : lifelist) {
-            wall.setVisible(false);
-        }
-        for (int i = 0; i < pacman.getLives(); i++) {
-            lifelist.get(i).setVisible(true);
-        }
-
+        resetGameAfterBeingEaten();
     }
 
     public static void main(String[] args) {

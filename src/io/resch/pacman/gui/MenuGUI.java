@@ -19,11 +19,9 @@ public class MenuGUI extends JFrame {
 
     private final JFrame jFrame;
     private final Container container;
-    private final Pacman pacman;
-    private final ArrayList<Ghost> ghosts = new ArrayList<>();
     static ArrayList<Score> highscores = new ArrayList<>();
 
-    private JTextField tf_name = null;
+    private final JTextField tf_name;
 
     public MenuGUI() {
         setBounds(0, 0, 448, 576);
@@ -81,106 +79,7 @@ public class MenuGUI extends JFrame {
             }
         });
 
-        pacman = new Pacman();
-        pacman.setLocation(0, 0);
-        pacman.setImage(pacman.getImage_right());
-        pacman.setX_speed(1);
-        pacman.setX_next(1);
-        container.add(pacman);
-
-        ghosts.add(new Blinky());
-        container.add(ghosts.get(0));
-        ghosts.get(0).setLocation(0, 0);
-
-        ghosts.add(new Inky());
-        container.add(ghosts.get(1));
-        ghosts.get(1).setLocation(0, 0);
-        ghosts.get(1).setX_speed(1);
-        ghosts.get(1).setX_next(1);
-
-        ghosts.add(new Pinky());
-        container.add(ghosts.get(2));
-        ghosts.get(2).setLocation(0, 0);
-        ghosts.get(2).setX_speed(1);
-        ghosts.get(2).setX_next(1);
-
-        ghosts.add(new Clyde());
-        container.add(ghosts.get(3));
-        ghosts.get(3).setLocation(0, 0);
-        ghosts.get(3).setX_speed(1);
-        ghosts.get(3).setX_next(1);
-
-        final long starttime = System.currentTimeMillis();
-        Thread animation = new Thread(() -> {
-            while (!Thread.interrupted()) {
-                if (System.currentTimeMillis() - starttime >= 1000) {
-                    ghosts.get(0).move();
-                }
-                if (System.currentTimeMillis() - starttime >= 1350) {
-                    ghosts.get(1).move();
-                }
-                if (System.currentTimeMillis() - starttime >= 1700) {
-                    ghosts.get(2).move();
-                }
-                if (System.currentTimeMillis() - starttime >= 2050) {
-                    ghosts.get(3).move();
-                }
-                for (Ghost ghost : ghosts) {
-                    if (ghost.getX() == 0 && ghost.getY() == 0) {
-                        ghost.setX_speed(1);
-                        ghost.setX_next(1);
-                        ghost.setY_speed(0);
-                    }
-                    if (ghost.getX() == 416 && ghost.getY() == 0) {
-                        ghost.setX_speed(0);
-                        ghost.setY_speed(1);
-                        ghost.setY_next(1);
-                    }
-                    if (ghost.getX() == 416 && ghost.getY() == 544) {
-                        ghost.setX_speed(-1);
-                        ghost.setY_speed(0);
-                        ghost.setX_next(-1);
-                    }
-                    if (ghost.getX() == 0 && ghost.getY() == 544) {
-                        ghost.setX_speed(0);
-                        ghost.setY_speed(-1);
-                        ghost.setY_next(-1);
-                    }
-                }
-
-                pacman.move();
-                if (pacman.getX() == 0 && pacman.getY() == 0) {
-                    pacman.setX_speed(1);
-                    pacman.setX_next(1);
-                    pacman.setY_speed(0);
-                    pacman.setImage(pacman.getImage_right());
-                }
-                if (pacman.getX() == 416 && pacman.getY() == 0) {
-                    pacman.setX_speed(0);
-                    pacman.setY_speed(1);
-                    pacman.setY_next(1);
-                    pacman.setImage(pacman.getImage_down());
-                }
-                if (pacman.getX() == 416 && pacman.getY() == 544) {
-                    pacman.setX_speed(-1);
-                    pacman.setY_speed(0);
-                    pacman.setX_next(-1);
-                    pacman.setImage(pacman.getImage_left());
-                }
-                if (pacman.getX() == 0 && pacman.getY() == 544) {
-                    pacman.setX_speed(0);
-                    pacman.setY_speed(-1);
-                    pacman.setY_next(-1);
-                    pacman.setImage(pacman.getImage_up());
-                }
-                try {
-                    Thread.sleep(pacman.getSpeed());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        animation.start();
+        addChasingPacmanAnimation();
 
         addKeyListener(new KeyListener() {
             @Override
@@ -200,6 +99,10 @@ public class MenuGUI extends JFrame {
             }
         });
         setVisible(true);
+    }
+
+    private void addChasingPacmanAnimation() {
+        new Thread(new ChasingAnimation(container)).start();
     }
 
     private void readScores() {

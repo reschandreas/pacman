@@ -1,6 +1,8 @@
 package io.resch.pacman.board;
 
 import io.resch.pacman.gui.*;
+import io.resch.pacman.utils.Utils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
@@ -16,7 +18,7 @@ public class Intersection extends JComponent {
     private final boolean left;
 
     public Intersection(Point location, boolean[] allowedDirections) {
-        setBounds(location.x, location.y, 2 * PacmanGUI.RESOLUTION, 2 * PacmanGUI.RESOLUTION);
+        setBounds(location.x, location.y, 2 * Utils.RESOLUTION, 2 * Utils.RESOLUTION);
         this.up = allowedDirections[0];
         this.down = allowedDirections[1];
         this.right = allowedDirections[2];

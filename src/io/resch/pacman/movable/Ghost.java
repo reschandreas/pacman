@@ -319,7 +319,7 @@ public abstract class Ghost extends MovableBoardItem {
         return (int) Math.sqrt((Math.pow(targetx - startx, 2) + Math.pow(targety - starty, 2)));
     }
 
-    public void modes(Mode mode) {
+    public void changeModeTo(Mode mode) {
         if (insideHouse)
             return;
 

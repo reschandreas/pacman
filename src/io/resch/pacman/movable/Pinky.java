@@ -1,6 +1,7 @@
 package io.resch.pacman.movable;
 
 import io.resch.pacman.gui.*;
+import io.resch.pacman.utils.Utils;
 
 /**
  * Created by Andreas on 09.04.16.
@@ -34,12 +35,12 @@ public class Pinky extends Ghost {
             int x = 0;
             int y = 0;
             switch (PacmanGUI.pacman.getX_speed()) {
-                case -1 -> x = -4 * PacmanGUI.RESOLUTION;
-                case 1 -> x = 4 * PacmanGUI.RESOLUTION;
+                case -1 -> x = -4 * Utils.RESOLUTION;
+                case 1 -> x = 4 * Utils.RESOLUTION;
             }
             switch (PacmanGUI.pacman.getY_speed()) {
-                case -1 -> y = -4 * PacmanGUI.RESOLUTION;
-                case 1 -> y = 4 * PacmanGUI.RESOLUTION;
+                case -1 -> y = -4 * Utils.RESOLUTION;
+                case 1 -> y = 4 * Utils.RESOLUTION;
             }
             setCurrentTarget(new int[]{PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
         } else {
