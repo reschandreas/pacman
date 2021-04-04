@@ -8,14 +8,14 @@ import io.resch.pacman.gui.*;
 public class Clyde extends Ghost {
 
     public Clyde() {
-        super("images/ghost_orange.png", "images/ghost_frightened.png");
+        super(Type.CLYDE);
         startpos[0] = 240;
         startpos[1] = 268;
         setLocation(startpos[0], startpos[1]);
         target[0] = 0;
         target[1] = 560;
-        current_target[0] = targetinhouse[0];
-        current_target[1] = targetinhouse[1];
+        currentTarget[0] = targetinhouse[0];
+        currentTarget[1] = targetinhouse[1];
     }
 
     @Override
@@ -29,11 +29,11 @@ public class Clyde extends Ghost {
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == CHASEMODE) {
+        if (getCurrentMode() == Mode.CHASE) {
             if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * PacmanGUI.RESOLUTION) {
-                setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+                setCurrentTarget(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
             } else {
-                setCurrent_target(target);
+                setCurrentTarget(target);
             }
         } else {
             super.calculateTarget();

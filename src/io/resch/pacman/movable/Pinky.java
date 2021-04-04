@@ -9,14 +9,14 @@ import io.resch.pacman.gui.*;
 public class Pinky extends Ghost {
 
     public Pinky() {
-        super("images/ghost_pink.png", "images/ghost_frightened.png");
+        super(Type.PINKY);
         startpos[0] = 240;
         startpos[1] = 268;
         setLocation(startpos[0], startpos[1]);
         target[0] = 32;
         target[1] = 0;
-        current_target[0] = targetinhouse[0];
-        current_target[1] = targetinhouse[1];
+        currentTarget[0] = targetinhouse[0];
+        currentTarget[1] = targetinhouse[1];
     }
 
     @Override
@@ -30,26 +30,18 @@ public class Pinky extends Ghost {
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == CHASEMODE) {
+        if (getCurrentMode() == Mode.CHASE) {
             int x = 0;
             int y = 0;
             switch (PacmanGUI.pacman.getX_speed()) {
-                case -1:
-                    x = -4 * PacmanGUI.RESOLUTION;
-                    break;
-                case 1:
-                    x = 4 * PacmanGUI.RESOLUTION;
-                    break;
+                case -1 -> x = -4 * PacmanGUI.RESOLUTION;
+                case 1 -> x = 4 * PacmanGUI.RESOLUTION;
             }
             switch (PacmanGUI.pacman.getY_speed()) {
-                case -1:
-                    y = -4 * PacmanGUI.RESOLUTION;
-                    break;
-                case 1:
-                    y = 4 * PacmanGUI.RESOLUTION;
-                    break;
+                case -1 -> y = -4 * PacmanGUI.RESOLUTION;
+                case 1 -> y = 4 * PacmanGUI.RESOLUTION;
             }
-            setCurrent_target(new int[]{PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
+            setCurrentTarget(new int[]{PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
         } else {
             super.calculateTarget();
         }

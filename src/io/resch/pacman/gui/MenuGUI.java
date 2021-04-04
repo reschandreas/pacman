@@ -47,23 +47,13 @@ public class MenuGUI extends JFrame {
         b_newgame.setFont(new Font("PacFont", Font.BOLD, 24));
         b_newgame.setBounds(75, 160, 300, 50);
         container.add(b_newgame);
-        b_newgame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startGame();
-            }
-        });
+        b_newgame.addActionListener(e -> startGame());
 
         JButton highscores = new JButton("Highscores");
         highscores.setFont(new Font("PacFont", Font.BOLD, 24));
         highscores.setBounds(75, 210, 300, 50);
         container.add(highscores);
-        highscores.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showScores();
-            }
-        });
+        highscores.addActionListener(e -> showScores());
 
         tf_name = new JTextField("Dein Name", SwingConstants.CENTER);
         tf_name.setFont(new Font("Serif", Font.BOLD, 24));
@@ -79,11 +69,9 @@ public class MenuGUI extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE:
-                        writeScores();
-                        jFrame.dispose();
-                        break;
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    writeScores();
+                    jFrame.dispose();
                 }
             }
 
@@ -123,75 +111,72 @@ public class MenuGUI extends JFrame {
         ghosts.get(3).setX_next(1);
 
         final long starttime = System.currentTimeMillis();
-        Thread animation = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!Thread.interrupted()) {
-                    if (System.currentTimeMillis() - starttime >= 1000) {
-                        ghosts.get(0).move();
+        Thread animation = new Thread(() -> {
+            while (!Thread.interrupted()) {
+                if (System.currentTimeMillis() - starttime >= 1000) {
+                    ghosts.get(0).move();
+                }
+                if (System.currentTimeMillis() - starttime >= 1350) {
+                    ghosts.get(1).move();
+                }
+                if (System.currentTimeMillis() - starttime >= 1700) {
+                    ghosts.get(2).move();
+                }
+                if (System.currentTimeMillis() - starttime >= 2050) {
+                    ghosts.get(3).move();
+                }
+                for (Ghost ghost : ghosts) {
+                    if (ghost.getX() == 0 && ghost.getY() == 0) {
+                        ghost.setX_speed(1);
+                        ghost.setX_next(1);
+                        ghost.setY_speed(0);
                     }
-                    if (System.currentTimeMillis() - starttime >= 1350) {
-                        ghosts.get(1).move();
+                    if (ghost.getX() == 416 && ghost.getY() == 0) {
+                        ghost.setX_speed(0);
+                        ghost.setY_speed(1);
+                        ghost.setY_next(1);
                     }
-                    if (System.currentTimeMillis() - starttime >= 1700) {
-                        ghosts.get(2).move();
+                    if (ghost.getX() == 416 && ghost.getY() == 544) {
+                        ghost.setX_speed(-1);
+                        ghost.setY_speed(0);
+                        ghost.setX_next(-1);
                     }
-                    if (System.currentTimeMillis() - starttime >= 2050) {
-                        ghosts.get(3).move();
+                    if (ghost.getX() == 0 && ghost.getY() == 544) {
+                        ghost.setX_speed(0);
+                        ghost.setY_speed(-1);
+                        ghost.setY_next(-1);
                     }
-                    for (Ghost ghost : ghosts) {
-                        if (ghost.getX() == 0 && ghost.getY() == 0) {
-                            ghost.setX_speed(1);
-                            ghost.setX_next(1);
-                            ghost.setY_speed(0);
-                        }
-                        if (ghost.getX() == 416 && ghost.getY() == 0) {
-                            ghost.setX_speed(0);
-                            ghost.setY_speed(1);
-                            ghost.setY_next(1);
-                        }
-                        if (ghost.getX() == 416 && ghost.getY() == 544) {
-                            ghost.setX_speed(-1);
-                            ghost.setY_speed(0);
-                            ghost.setX_next(-1);
-                        }
-                        if (ghost.getX() == 0 && ghost.getY() == 544) {
-                            ghost.setX_speed(0);
-                            ghost.setY_speed(-1);
-                            ghost.setY_next(-1);
-                        }
-                    }
+                }
 
-                    pacman.move();
-                    if (pacman.getX() == 0 && pacman.getY() == 0) {
-                        pacman.setX_speed(1);
-                        pacman.setX_next(1);
-                        pacman.setY_speed(0);
-                        pacman.setImage(pacman.getImage_right());
-                    }
-                    if (pacman.getX() == 416 && pacman.getY() == 0) {
-                        pacman.setX_speed(0);
-                        pacman.setY_speed(1);
-                        pacman.setY_next(1);
-                        pacman.setImage(pacman.getImage_down());
-                    }
-                    if (pacman.getX() == 416 && pacman.getY() == 544) {
-                        pacman.setX_speed(-1);
-                        pacman.setY_speed(0);
-                        pacman.setX_next(-1);
-                        pacman.setImage(pacman.getImage_left());
-                    }
-                    if (pacman.getX() == 0 && pacman.getY() == 544) {
-                        pacman.setX_speed(0);
-                        pacman.setY_speed(-1);
-                        pacman.setY_next(-1);
-                        pacman.setImage(pacman.getImage_up());
-                    }
-                    try {
-                        Thread.sleep(pacman.getSpeed());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                pacman.move();
+                if (pacman.getX() == 0 && pacman.getY() == 0) {
+                    pacman.setX_speed(1);
+                    pacman.setX_next(1);
+                    pacman.setY_speed(0);
+                    pacman.setImage(pacman.getImage_right());
+                }
+                if (pacman.getX() == 416 && pacman.getY() == 0) {
+                    pacman.setX_speed(0);
+                    pacman.setY_speed(1);
+                    pacman.setY_next(1);
+                    pacman.setImage(pacman.getImage_down());
+                }
+                if (pacman.getX() == 416 && pacman.getY() == 544) {
+                    pacman.setX_speed(-1);
+                    pacman.setY_speed(0);
+                    pacman.setX_next(-1);
+                    pacman.setImage(pacman.getImage_left());
+                }
+                if (pacman.getX() == 0 && pacman.getY() == 544) {
+                    pacman.setX_speed(0);
+                    pacman.setY_speed(-1);
+                    pacman.setY_next(-1);
+                    pacman.setImage(pacman.getImage_up());
+                }
+                try {
+                    Thread.sleep(pacman.getSpeed());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -204,12 +189,9 @@ public class MenuGUI extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE: {
-                        jFrame.dispose();
-                        System.exit(0);
-                        break;
-                    }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    jFrame.dispose();
+                    System.exit(0);
                 }
             }
 
@@ -289,11 +271,8 @@ public class MenuGUI extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_ESCAPE: {
-                        dialog.dispose();
-                        break;
-                    }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    dialog.dispose();
                 }
             }
 

@@ -3,6 +3,7 @@ package io.resch.pacman.board;
 import io.resch.pacman.gui.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Created by Andreas on 10.04.16.
@@ -14,13 +15,21 @@ public class Intersection extends JComponent {
     private final boolean right;
     private final boolean left;
 
-    public Intersection(int x, int y, boolean up, boolean down, boolean right, boolean left) {
-        setBounds(x, y, 2 * PacmanGUI.RESOLUTION, 2 * PacmanGUI.RESOLUTION);
-        this.up = up;
-        this.down = down;
-        this.right = right;
-        this.left = left;
+    public Intersection(Point location, boolean[] allowedDirections) {
+        setBounds(location.x, location.y, 2 * PacmanGUI.RESOLUTION, 2 * PacmanGUI.RESOLUTION);
+        this.up = allowedDirections[0];
+        this.down = allowedDirections[1];
+        this.right = allowedDirections[2];
+        this.left = allowedDirections[3];
         setVisible(false);
+    }
+
+    public static Intersection create(String[] strings) {
+        boolean[] allowedDirections = new boolean[4];
+        for (int i = 2; i < allowedDirections.length + 2; i++) {
+            allowedDirections[i - 2] = Boolean.parseBoolean(strings[i]);
+        }
+        return new Intersection(new Point(Integer.parseInt(strings[0]), Integer.parseInt(strings[1])), allowedDirections);
     }
 
     public void paint(Graphics g) {
@@ -42,5 +51,18 @@ public class Intersection extends JComponent {
 
     public boolean isUp() {
         return up;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Intersection that = (Intersection) o;
+        return up == that.up && down == that.down && right == that.right && left == that.left;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(up, down, right, left);
     }
 }

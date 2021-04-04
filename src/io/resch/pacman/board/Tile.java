@@ -1,6 +1,7 @@
 package io.resch.pacman.board;
 
 import io.resch.pacman.gui.*;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,8 +10,8 @@ import java.awt.*;
  */
 public class Tile extends JComponent {
 
-    public Tile(int x, int y) {
-        setBounds(x, y, PacmanGUI.RESOLUTION, PacmanGUI.RESOLUTION);
+    public Tile(Point location) {
+        setBounds(location.x, location.y, PacmanGUI.RESOLUTION, PacmanGUI.RESOLUTION);
         setVisible(false);
     }
 
@@ -20,10 +21,10 @@ public class Tile extends JComponent {
     }
 
     public int getRealX() {
-        return getX() + getWidth()/2;
+        return getX() + getWidth() / 2;
     }
 
     public int getRealY() {
-        return getY() + getHeight()/2;
+        return getY() + getHeight() / 2;
     }
 }

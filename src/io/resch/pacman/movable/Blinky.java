@@ -9,26 +9,26 @@ import io.resch.pacman.gui.*;
 public class Blinky extends Ghost {
 
     public Blinky() {
-        super("images/ghost_red.png", "images/ghost_frightened.png");
-        insidehouse = false;
+        super(Type.BLINKY);
+        insideHouse = false;
         startpos[0] = 208;
         startpos[1] = 216;
         setLocation(startpos[0], startpos[1]);
-        target[0] = current_target[0] = 400;
-        target[1] = current_target[1] = 0;
+        target[0] = currentTarget[0] = 400;
+        target[1] = currentTarget[1] = 0;
     }
 
 
     @Override
     protected void chaseMode() {
         super.chaseMode();
-        setCurrent_target(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+        setCurrentTarget(new int[] {PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
     }
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == CHASEMODE) {
-            setCurrent_target(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+        if (getCurrentMode() == Mode.CHASE) {
+            setCurrentTarget(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
         } else {
             super.calculateTarget();
         }

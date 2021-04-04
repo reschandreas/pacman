@@ -10,42 +10,20 @@ import java.net.URL;
 /**
  * Created by Andreas on 03.04.16.
  */
-public class Wall extends JComponent {
+public class Wall extends BoardItem {
 
-    protected Image image = null;
-    private String image_path = null;
-
-    public Wall(String path) {
-        image_path = path;
-
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream(path);
-
-        if (input == null) {
-            System.out.println("file not found --- " + path);
-        } else {
-            try {
-                this.image = image = ImageIO.read(input);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            // Stelle Größe des Objektes auf Größe des Bildes ein
-            this.setSize(this.image.getWidth(this), this.image.getHeight(this));
-        }
+    public Wall(Type type) {
+        super(type);
     }
 
-    /**
-     * Methode, welche automatisch aufgerufen wird und das Bild in der Größe des Objektes
-     * darstellt
-     */
-
-    public void paint(Graphics g) {
-        if (image != null) {
-            g.drawImage(this.image, 0, 0, this);
+    public static Wall create(String[] strings) {
+        Wall wall;
+        switch (strings[0]) {
+            case "wall_right.png" -> wall = new Wall(Type.WALL_RIGHT);
+            case "wall_up.png" -> wall = new Wall(Type.WALL_UP);
+            default -> wall = new Wall(Type.WALL_NORMAL);
         }
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
+        wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
+        return wall;
     }
 }

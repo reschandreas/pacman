@@ -2,90 +2,66 @@ package io.resch.pacman.movable;
 
 import io.resch.pacman.board.*;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Random;
 
 /**
  * Created by Andreas on 03.04.16.
  */
-public abstract class Ghost extends Pacman {
+public abstract class Ghost extends MovableBoardItem {
 
-    public static final int SCATTERMODE = 0;
-    public static final int CHASEMODE = 1;
-    public static final int FRIGHTENEDMODE = 2;
+    public enum Mode {
+        SCATTER,
+        CHASE,
+        FRIGHTENED
+    }
+
     protected Image image_frightened = null;
-    protected Image image_normal = null;
 
     private Random random = new Random();
 
-    protected int current_mode = SCATTERMODE;
-    protected int prev_mode = SCATTERMODE;
+    protected Mode current_mode = Mode.SCATTER;
+    protected Mode prev_mode = Mode.CHASE;
     public static int[] targetinhouse = {208, 240};
     public static int[] targetouthouse = {208, 216};
 
-    public boolean insidehouse;
+    public boolean insideHouse = true;
 
     protected int[] target = new int[2];
 
-    protected int[] current_target = target.clone();
+    protected int[] currentTarget = target.clone();
 
-    public Ghost(String path) {
-        super(path);
-        insidehouse = true;
+    public Ghost(Type type) {
+        super(type);
+        try {
+            this.image_frightened = loadImage(Type.FRIGHTENED.label);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         speed = 7;
         setEatable(false);
-        current_target[0] = target[0];
-        current_target[1] = target[1];
-        current_mode = SCATTERMODE;
+        currentTarget[0] = target[0];
+        currentTarget[1] = target[1];
+        current_mode = Mode.SCATTER;
     }
 
-    public Ghost(String path, String frightened) {
-        this(path);
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream(path);
-
-        if (input == null)
-            System.out.println("Ghost file not found --- " + path);
-        else {
-            try {
-                this.image_normal = ImageIO.read(input);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        input = classLoader.getResourceAsStream(frightened);
-        if (input == null)
-            System.out.println("Ghost file not found --- " + path);
-        else {
-            try {
-                this.image_frightened = ImageIO.read(input);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public boolean isInsideHouse() {
+        return insideHouse;
     }
 
-    public boolean isInsidehouse() {
-        return insidehouse;
-    }
-
-    @Override
     public void start() {
         setLocation(startpos[0], startpos[1]);
         x_speed = x_next = -1;
         y_speed = y_next = 0;
-        insidehouse = true;
+        insideHouse = true;
     }
 
     public void resume() {
         setLocation(targetinhouse[0], targetinhouse[1]);
         x_speed = x_next = -1;
         y_speed = y_next = 0;
-        insidehouse = true;
+        insideHouse = true;
     }
 
     private int compareWays(int a, int b) {
@@ -123,7 +99,7 @@ public abstract class Ghost extends Pacman {
         if (getX() == 240 && getY() == 268 || getX() == 176 && getY() == 268) {
             x_speed *= -1;
         }
-        if (insidehouse) {
+        if (insideHouse) {
             if (getX() == targetinhouse[0] && getY() == targetinhouse[1]) {
                 x_speed = 0;
                 y_speed = -1;
@@ -136,26 +112,27 @@ public abstract class Ghost extends Pacman {
                 x_next = 0;
                 y_next = 1;
                 setTarget(target);
-                insidehouse = false;
+                insideHouse = false;
             }
         } else {
             Intersection i = intersectionCheck();
             if (i != null) {
                 do {
-                    if (current_mode != FRIGHTENEDMODE) {
+                    if (current_mode != Mode.FRIGHTENED) {
                         if (up != -1)
-                            up = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY());
+                            up = pythagoras(currentTarget[0], currentTarget[1], i.getX() + i.getWidth() / 2, i.getY());
                         if (down != -1)
-                            down = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
+                            down = pythagoras(currentTarget[0], currentTarget[1], i.getX() + i.getWidth() / 2, i.getY() + i.getHeight());
                         if (left != -1)
-                            left = pythagoras(current_target[0], current_target[1], i.getX(), i.getY() + i.getHeight() / 2);
+                            left = pythagoras(currentTarget[0], currentTarget[1], i.getX(), i.getY() + i.getHeight() / 2);
                         if (right != -1)
-                            right = pythagoras(current_target[0], current_target[1], i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
+                            right = pythagoras(currentTarget[0], currentTarget[1], i.getX() + i.getWidth(), i.getY() + i.getHeight() / 2);
                     }
+                    //Von rechts in die Kreuzung
+                    //Von links in die Kreuzung
                     switch (getX_speed()) {
-                        //Von rechts in die Kreuzung
-                        case -1: {
-                            if (current_mode != FRIGHTENEDMODE) {
+                        case -1 -> {
+                            if (current_mode != Mode.FRIGHTENED) {
                                 way = compareWays(up, down, left);
                                 if (way == up)
                                     way = 1;
@@ -192,9 +169,8 @@ public abstract class Ghost extends Pacman {
                             }
                             break;
                         }
-                        //Von links in die Kreuzung
-                        case 1: {
-                            if (current_mode != FRIGHTENEDMODE) {
+                        case 1 -> {
+                            if (current_mode != Mode.FRIGHTENED) {
                                 way = compareWays(up, down, right);
                                 if (way == up)
                                     way = 1;
@@ -229,12 +205,11 @@ public abstract class Ghost extends Pacman {
                                     }
                                     break;
                             }
-                            break;
                         }
                     }
                     switch (getY_speed()) {
-                        case -1: {
-                            if (current_mode != FRIGHTENEDMODE) {
+                        case -1 -> {
+                            if (current_mode != Mode.FRIGHTENED) {
                                 way = compareWays(up, left, right);
                                 if (way == up)
                                     way = 1;
@@ -268,8 +243,8 @@ public abstract class Ghost extends Pacman {
                             }
                             break;
                         }
-                        case 1: {
-                            if (current_mode != FRIGHTENEDMODE) {
+                        case 1 -> {
+                            if (current_mode != Mode.FRIGHTENED) {
                                 way = compareWays(down, left, right);
                                 if (way == down)
                                     way = 1;
@@ -317,14 +292,14 @@ public abstract class Ghost extends Pacman {
     }
 
     public void calculateTarget() {
-        setCurrent_target(target);
+        setCurrentTarget(target);
     }
 
-    public int getCurrentMode() {
+    public Mode getCurrentMode() {
         return current_mode;
     }
 
-    public int getPrev_mode() {
+    public Mode getPrev_mode() {
         return prev_mode;
     }
 
@@ -336,56 +311,52 @@ public abstract class Ghost extends Pacman {
         return target;
     }
 
-    public void setCurrent_target(int[] current_target) {
-        this.current_target = current_target;
+    public void setCurrentTarget(int[] current_target) {
+        this.currentTarget = current_target;
     }
 
     protected int pythagoras(int targetx, int targety, int startx, int starty) {
         return (int) Math.sqrt((Math.pow(targetx - startx, 2) + Math.pow(targety - starty, 2)));
     }
 
-    public void modes(int mode) {
-        if (!insidehouse) {
-            prev_mode = current_mode;
-            switch (mode) {
-                case SCATTERMODE:
-                    current_mode = mode;
-                    scatterMode();
-                    break;
-                case CHASEMODE:
-                    current_mode = mode;
-                    chaseMode();
-                    break;
-                case FRIGHTENEDMODE:
-                    current_mode = mode;
-                    frightenedMode();
-                    break;
-            }
+    public void modes(Mode mode) {
+        if (insideHouse)
+            return;
+
+        setMode(mode);
+        switch (mode) {
+            case SCATTER -> scatterMode();
+            case CHASE -> chaseMode();
+            case FRIGHTENED -> frightenedMode();
         }
     }
 
+    private void setMode(Mode mode) {
+        prev_mode = current_mode;
+        this.current_mode = mode;
+    }
+
     protected void chaseMode() {
-        if (prev_mode == SCATTERMODE)
+        setImage(image);
+        if (prev_mode == Mode.SCATTER)
             reverse();
-        setImage(image_normal);
         setEatable(false);
     }
 
     protected void scatterMode() {
-        if (prev_mode == CHASEMODE)
+        setImage(image);
+        if (prev_mode == Mode.CHASE)
             reverse();
         else {
-            setImage(image_normal);
             setEatable(false);
         }
-        setCurrent_target(target);
-
+        setCurrentTarget(target);
     }
 
     protected void frightenedMode() {
+        setImage(image_frightened);
         reverse();
         setEatable(true);
-        setImage(image_frightened);
     }
 
     private void reverse() {
