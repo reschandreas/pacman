@@ -3,6 +3,8 @@ package io.resch.pacman.movable;
 import io.resch.pacman.gui.*;
 import io.resch.pacman.utils.Utils;
 
+import java.awt.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Blue Ghost
@@ -10,14 +12,8 @@ import io.resch.pacman.utils.Utils;
 public class Inky extends Ghost {
 
     public Inky() {
-        super(Type.INKY);
-        startpos[0] = 176;
-        startpos[1] = 268;
-        setLocation(startpos[0], startpos[1]);
-        target[0] = 432;
-        target[1] = 560;
-        currentTarget[0] = targetinhouse[0];
-        currentTarget[1] = targetinhouse[1];
+        super(Type.INKY, new Point(176, 268), new Point(432, 560));
+        currentTarget = new Point(targetInHouse.x, targetInHouse.y);
     }
 
     @Override
@@ -31,7 +27,7 @@ public class Inky extends Ghost {
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == Mode.CHASE) {
+        if (getCurrentMode().equals(Mode.CHASE)) {
             int targetx = 0;
             int targety = 0;
             switch (PacmanGUI.pacman.getX_speed()) {
@@ -46,7 +42,7 @@ public class Inky extends Ghost {
             targety += PacmanGUI.pacman.getRealY();
             int x_blinky = PacmanGUI.ghosts.get(0).getRealX();
             int y_blinky = PacmanGUI.ghosts.get(0).getRealY();
-            setCurrentTarget(new int[]{x_blinky + (2 * (targetx - x_blinky)), y_blinky + (2 * (targety - y_blinky))});
+            setCurrentTarget(new Point(x_blinky + (2 * (targetx - x_blinky)), y_blinky + (2 * (targety - y_blinky))));
         } else {
             super.calculateTarget();
         }

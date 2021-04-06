@@ -3,6 +3,8 @@ package io.resch.pacman.movable;
 import io.resch.pacman.gui.*;
 import io.resch.pacman.utils.Utils;
 
+import java.awt.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Orange Ghost
@@ -10,14 +12,7 @@ import io.resch.pacman.utils.Utils;
 public class Clyde extends Ghost {
 
     public Clyde() {
-        super(Type.CLYDE);
-        startpos[0] = 240;
-        startpos[1] = 268;
-        setLocation(startpos[0], startpos[1]);
-        target[0] = 0;
-        target[1] = 560;
-        currentTarget[0] = targetinhouse[0];
-        currentTarget[1] = targetinhouse[1];
+        super(Type.CLYDE, new Point(240, 268), new Point(0, 560));
     }
 
     @Override
@@ -31,9 +26,9 @@ public class Clyde extends Ghost {
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == Mode.CHASE) {
-            if (pythagoras(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY(), getRealX(), getRealY()) >= 8 * Utils.RESOLUTION) {
-                setCurrentTarget(new int[]{PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()});
+        if (getCurrentMode().equals(Mode.CHASE)) {
+            if (Utils.pythagoras(new Point(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()), getRealX(), getRealY()) >= 8 * Utils.RESOLUTION) {
+                setCurrentTarget(new Point(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()));
             } else {
                 setCurrentTarget(target);
             }

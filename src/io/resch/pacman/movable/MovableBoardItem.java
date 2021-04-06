@@ -3,6 +3,7 @@ package io.resch.pacman.movable;
 import io.resch.pacman.board.BoardItem;
 import io.resch.pacman.board.Intersection;
 import io.resch.pacman.board.Wall;
+import io.resch.pacman.board.way.Direction;
 import io.resch.pacman.gui.PacmanGUI;
 import io.resch.pacman.utils.Utils;
 
@@ -17,13 +18,15 @@ public class MovableBoardItem extends BoardItem {
     int y_speed = 0;
     private boolean eatable = true;
 
-    int[] startpos = new int[2];
+    Point startPosition;
 
     int x_next = 0;
     int y_next = 0;
 
-    public MovableBoardItem(Type type) {
+    public MovableBoardItem(Type type, Point startPosition) {
         super(type);
+        this.startPosition = startPosition;
+        setLocation(startPosition);
     }
 
     protected Intersection intersectionCheck() {
@@ -38,9 +41,9 @@ public class MovableBoardItem extends BoardItem {
     }
 
     public void move() {
-        Intersection intersection = intersectionCheck();
+        /*Intersection intersection = intersectionCheck();
         if (intersection != null && (intersection.isLeft() && x_next == -1 || intersection.isRight() && x_next == 1
-                || intersection.isUp() && y_next == -1 || intersection.isDown() && y_next == 1)) {
+                || intersection.isUp(this) && y_next == -1 || intersection.isDown() && y_next == 1)) {
             changeDirection();
             moveHorizontal();
             moveVertical();
@@ -49,10 +52,7 @@ public class MovableBoardItem extends BoardItem {
         }
         if (intersection != null)
             return;
-
-        if (y_next == y_speed * -1 || x_next == x_speed * -1) {
-            changeDirection();
-        }
+*/
         if (getX() == 240 && getY() == 268) {
             x_speed = -1;
         }
@@ -60,7 +60,7 @@ public class MovableBoardItem extends BoardItem {
         moveVertical();
     }
 
-    private void changeDirection() {
+    protected void changeDirection() {
         if (image_next != null)
             image = image_next;
         x_speed = x_next;
@@ -129,6 +129,38 @@ public class MovableBoardItem extends BoardItem {
 
     public void setY_next(int y_next) {
         this.y_next = y_next;
+    }
+
+    public void goUp() {
+        setX_next(0);
+        setY_next(-1);
+    }
+
+    public void goDown() {
+        setX_next(0);
+        setY_next(1);
+    }
+
+    public void goLeft() {
+        setY_next(0);
+        setX_next(-1);
+    }
+
+    public void goRight() {
+        setY_next(0);
+        setX_next(1);
+    }
+
+    public Direction getCurrentDirection() {
+        return switch (x_speed) {
+            case -1 -> Direction.LEFT;
+            case 1 -> Direction.RIGHT;
+            default -> switch (y_speed) {
+                case -1 -> Direction.UP;
+                case 1 -> Direction.DOWN;
+                default -> null;
+            };
+        };
     }
 
     public int getRealX() {

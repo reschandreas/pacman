@@ -19,8 +19,8 @@ public class Wall extends BoardItem {
     public static Wall create(String[] strings) {
         Wall wall;
         switch (strings[0]) {
-            case "wall_right.png" -> wall = new Wall(Type.WALL_RIGHT);
-            case "wall_up.png" -> wall = new Wall(Type.WALL_UP);
+            case "R" -> wall = new Wall(Type.WALL_RIGHT);
+            case "U" -> wall = new Wall(Type.WALL_UP);
             default -> wall = new Wall(Type.WALL_NORMAL);
         }
         wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());

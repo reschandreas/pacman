@@ -22,8 +22,6 @@ public class PacmanGUI extends JFrame {
     public static long playerpoints;
     public static int playerlevel = -1;
 
-    private final double[][] speedlist = new double[4][7];
-
     private final List<Wall> lifelist = new ArrayList<>();
 
     private final List<Wall> walls = new ArrayList<>();
@@ -72,8 +70,6 @@ public class PacmanGUI extends JFrame {
 
         intersections = new ArrayList<>();
         ghosts = new ArrayList<>();
-
-        readDatas();
 
         drawMaze();
 
@@ -130,16 +126,20 @@ public class PacmanGUI extends JFrame {
                                    case KeyEvent.VK_P:
                                        if (paused) {
                                            paused = false;
-                                           moveThread.resume();
-                                           ghostThread.resume();
-                                           wavethread.resume();
+                                           try {
+                                               moveThread.wait();
+                                               ghostThread.wait();
+                                               wavethread.wait();
+                                           } catch (InterruptedException interruptedException) {
+                                               interruptedException.printStackTrace();
+                                           }
                                            pausedtime += System.currentTimeMillis() - temptime;
                                        } else {
                                            paused = true;
                                            temptime = System.currentTimeMillis();
-                                           moveThread.suspend();
-                                           ghostThread.suspend();
-                                           wavethread.suspend();
+                                           moveThread.notify();
+                                           ghostThread.notify();
+                                           wavethread.notify();
                                        }
                                        break;
                                    case KeyEvent.VK_ESCAPE:
@@ -159,8 +159,19 @@ public class PacmanGUI extends JFrame {
                                        }
                                        break;
                                    case KeyEvent.VK_T: {
-                                       for (Tile tile : tiles) {
-                                           tile.setVisible(!tile.isVisible());
+                                       if (tiles.isEmpty()) {
+                                           for (int i = 0; i < Utils.WIDTH; i += Utils.RESOLUTION) {
+                                               for (int j = 0; j < Utils.HEIGHT; j += Utils.RESOLUTION) {
+                                                   Tile tile = new Tile(new Point(i, j));
+                                                   tiles.add(tile);
+                                                   container.add(tile);
+                                               }
+                                           }
+                                       } else {
+                                           for (Tile tile : tiles) {
+                                               container.remove(tile);
+                                           }
+                                           tiles.clear();
                                        }
                                        break;
                                    }
@@ -189,21 +200,13 @@ public class PacmanGUI extends JFrame {
                            public void keyReleased(final KeyEvent e) {
                                switch (e.getKeyCode()) {
                                    //UP
-                                   case KeyEvent.VK_W:
-                                       pacman.setY_next(-1);
-                                       break;
+                                   case KeyEvent.VK_W -> pacman.setY_next(-1);
                                    //DOWN
-                                   case KeyEvent.VK_S:
-                                       pacman.setY_next(1);
-                                       break;
+                                   case KeyEvent.VK_S -> pacman.setY_next(1);
                                    //LEFT
-                                   case KeyEvent.VK_A:
-                                       pacman.setX_next(-1);
-                                       break;
+                                   case KeyEvent.VK_A -> pacman.setX_next(-1);
                                    //RIGHT
-                                   case KeyEvent.VK_D:
-                                       pacman.setX_next(1);
-                                       break;
+                                   case KeyEvent.VK_D -> pacman.setX_next(1);
                                }
                            }
                        }
@@ -213,32 +216,20 @@ public class PacmanGUI extends JFrame {
             do {
                 while (!Thread.interrupted() && !dots.isEmpty() && !caught()) {
                     pacman.move();
-                    int column;
+                    boolean ghostsFrightened = ghosts.get(0).getCurrentMode().equals(Ghost.Mode.FRIGHTENED);
+                    Speed.Type column;
                     boolean eaten = eatenDots();
                     if (!eaten) {
-                        column = 0;
-                    } else column = 1;
-                    if (!eaten && ghosts.get(0).getCurrentMode() == Ghost.Mode.FRIGHTENED)
-                        column = 2;
-                    if (eaten && ghosts.get(0).getCurrentMode() == Ghost.Mode.FRIGHTENED)
-                        column = 3;
-                    double tempspeed;
-                    switch (level) {
-                        case 1:
-                            tempspeed = (pacman.getSpeed() * speedlist[0][column]);
-                            break;
-                        case 2:
-                        case 3:
-                        case 4:
-                            tempspeed = (pacman.getSpeed() * speedlist[1][column]);
-                            break;
-                        default:
-                            if (level <= 20)
-                                tempspeed = (pacman.getSpeed() * speedlist[2][column]);
-                            else
-                                tempspeed = (pacman.getSpeed() * speedlist[3][column]);
-                            break;
-                    }
+                        column = Speed.Type.NORMAL;
+                    } else column = Speed.Type.DOT_NORMAL;
+                    if (!eaten && ghostsFrightened)
+                        column = Speed.Type.FRIGHT;
+                    if (eaten && ghostsFrightened)
+                        column = Speed.Type.DOT_FRIGHT;
+
+                    double tempspeed = (pacman.getSpeed() * Speeds.getCurrentSpeedLimits(level)
+                            .getSpeedByType(column)
+                            .getValue());
                     long speedms = (long) tempspeed;
                     double temp = (tempspeed - speedms) * 1000;
                     int speedns = (int) temp;
@@ -266,64 +257,47 @@ public class PacmanGUI extends JFrame {
         ghostThread = new Thread(() -> {
             do {
                 while (!Thread.interrupted() && !dots.isEmpty() && !caught()) {
-                    int row = 4;
                     double tempspeed, temp;
                     long speedms;
                     int speedns;
-                    for (int i = 0; i < ghosts.size(); i++) {
-                        if (ghosts.get(i) instanceof Blinky) {
-                            ghosts.get(i).move();
+                    for (Ghost ghost : ghosts) {
+                        if (ghost instanceof Blinky) {
+                            ghost.move();
                         }
-                        if (ghosts.get(i) instanceof Pinky) {
-                            ghosts.get(i).move();
+                        if (ghost instanceof Pinky) {
+                            ghost.move();
                         }
-                        if (ghosts.get(i) instanceof Inky) {
+                        if (ghost instanceof Inky) {
                             if (dots.size() <= 242 - 30) {
-                                if (ghosts.get(i).isInsideHouse()) {
-                                    ghosts.get(i).setTarget(Ghost.targetinhouse);
-                                } else if (ghosts.get(i).getTarget()[0] == Ghost.targetouthouse[0] &&
-                                        ghosts.get(i).getTarget()[1] == Ghost.targetouthouse[1]) {
-                                    ghosts.get(i).calculateTarget();
+                                if (ghost.isInsideHouse()) {
+                                    ghost.setTarget(Ghost.targetInHouse);
+                                } else if (ghost.getTarget().equals(Ghost.targetOutHouse)) {
+                                    ghost.calculateTarget();
                                 }
-                                ghosts.get(i).move();
+                                ghost.move();
                             }
                         }
-                        if (ghosts.get(i) instanceof Clyde)
+                        if (ghost instanceof Clyde) {
                             if (dots.size() <= 242 - 80) {
-                                if (ghosts.get(i).isInsideHouse()) {
-                                    ghosts.get(i).setTarget(Ghost.targetouthouse);
-                                } else if (ghosts.get(i).getTarget()[0] == Ghost.targetouthouse[0] &&
-                                        ghosts.get(i).getTarget()[1] == Ghost.targetouthouse[1]) {
-                                    ghosts.get(i).calculateTarget();
+                                if (ghost.isInsideHouse()) {
+                                    ghost.setTarget(Ghost.targetOutHouse);
+                                } else if (ghost.getTarget().equals(Ghost.targetOutHouse)) {
+                                    ghost.calculateTarget();
                                 }
-                                ghosts.get(i).move();
-                            }
-                        for (Ghost ghost : ghosts) {
-                            if (ghost.getCurrentMode() == Ghost.Mode.FRIGHTENED) {
-                                row = 5;
-                                break;
+                                ghost.move();
                             }
                         }
                     }
-                    switch (level) {
-                        case 1:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[0][row]);
-                            break;
-                        case 2:
-                        case 3:
-                        case 4:
-                            tempspeed = (ghosts.get(0).getSpeed() * speedlist[1][row]);
-                            break;
-                        default:
-                            if (level <= 20)
-                                tempspeed = (ghosts.get(0).getSpeed() * speedlist[2][row]);
-                            else
-                                tempspeed = (ghosts.get(0).getSpeed() * speedlist[3][row]);
-                            break;
-                    }
+
+                    tempspeed = (ghosts.get(0).getSpeed() * Speeds.getCurrentSpeedLimits(level)
+                            .getSpeedByType(ghosts.get(0).getCurrentMode().equals(Ghost.Mode.FRIGHTENED) ?
+                                    Speed.Type.GHOST_FRIGHT :
+                                    Speed.Type.GHOST_NORMAL)
+                            .getValue());
                     speedms = (long) tempspeed;
                     temp = (tempspeed - speedms) * 1000;
                     speedns = (int) temp;
+
                     try {
                         Thread.sleep(speedms, speedns);
                     } catch (InterruptedException ignored) {
@@ -348,7 +322,8 @@ public class PacmanGUI extends JFrame {
                     if (fright_time != 0) {
                         if (System.currentTimeMillis() - fright_time - pausedtime > 7000) {
                             for (Ghost ghost : ghosts) {
-                                ghost.changeModeTo(ghost.getPrev_mode());
+                                ghost.changeModeTo(ghost.getPreviousMode());
+                                ghost.repaint();
                             }
                             fright_time = 0;
                         }
@@ -392,10 +367,10 @@ public class PacmanGUI extends JFrame {
 
     private boolean caught() {
         for (Ghost ghost : ghosts) {
-            if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY())
+            if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY()) {
+                System.out.println(ghost.getCurrentMode().toString());
                 if (ghost.isEatable()) {
-                    ghost.changeModeTo(ghost.getPrev_mode());
-                    ghost.resume();
+                    ghost.getsEaten();
                 } else {
                     if (!caught) {
                         pacman.deductLife();
@@ -404,6 +379,7 @@ public class PacmanGUI extends JFrame {
                     }
                     return true;
                 }
+            }
         }
         return false;
     }
@@ -431,43 +407,21 @@ public class PacmanGUI extends JFrame {
                         delay += 7000;
                         fright_time = System.currentTimeMillis();
                         for (Ghost ghost : ghosts) {
-                            if (ghost.getCurrentMode() != Ghost.Mode.FRIGHTENED) {
-                                ghost.changeModeTo(Ghost.Mode.FRIGHTENED);
-                                ghost.repaint();
-                            }
+                            ghost.changeModeTo(Ghost.Mode.FRIGHTENED);
                         }
                     }
-                    dots.get(i).die();
-                    dots.remove(i);
+                    dots.get(i).eaten();
+                    container.remove(dots.get(i));
                     pacman.setPoints(pacman.getPoints() + dots.get(i).getPoints());
                     l_score.setText(String.valueOf(pacman.getPoints()));
                     playerpoints = pacman.getPoints();
+                    dots.remove(i);
                     container.repaint();
                     break;
                 }
             }
         });
         return temp != dots.size();
-    }
-
-    private void readDatas() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream("data/speeds.data");
-        if (input == null) {
-            return;
-        }
-        Scanner reader = new Scanner(input).useDelimiter("\\n");
-        int i = 0;
-        String line;
-        while (!(line = reader.hasNext() ? reader.next() : "").isEmpty()) {
-            String[] strings = line.split(";");
-            int j = 0;
-            for (String s : strings) {
-                speedlist[i][j] = Double.parseDouble(s);
-                j++;
-            }
-            i++;
-        }
     }
 
     private void drawMaze() {
@@ -515,16 +469,6 @@ public class PacmanGUI extends JFrame {
                 dots.add(dot);
             }
             reader.close();
-        }
-
-        if (tiles.isEmpty()) {
-            for (int i = 0; i < Utils.WIDTH; i += Utils.RESOLUTION) {
-                for (int j = 0; j < Utils.HEIGHT; j += Utils.RESOLUTION) {
-                    Tile tile = new Tile(new Point(i, j));
-                    tiles.add(tile);
-                    container.add(tile);
-                }
-            }
         }
     }
 

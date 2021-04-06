@@ -1,15 +1,9 @@
 package io.resch.pacman.movable;
 
-import io.resch.pacman.board.Wall;
+import io.resch.pacman.board.Intersection;
 
-import io.resch.pacman.board.*;
-import io.resch.pacman.gui.*;
-
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -33,13 +27,10 @@ public class Pacman extends MovableBoardItem {
     }
 
     protected Pacman(Type type) {
-        super(type);
+        super(type, new Point(208, 408));
         setImages();
         setEatable(true);
-        startpos[0] = 208;
-        startpos[1] = 408;
         speed = 5;
-        setLocation(startpos[0], startpos[1]);
         x_speed = -1;
         x_next = -1;
     }
@@ -57,7 +48,7 @@ public class Pacman extends MovableBoardItem {
     }
 
     public void start() {
-        setLocation(startpos[0], startpos[1]);
+        setLocation(startPosition);
         x_speed = x_next = -1;
         y_speed = y_next = 0;
         image = this.image_next = image_left;
@@ -155,5 +146,21 @@ public class Pacman extends MovableBoardItem {
 
     public void setPoints(long points) {
         this.points = points;
+    }
+
+    @Override
+    public void move() {
+        Intersection intersection = intersectionCheck();
+        if (intersection != null && (intersection.isLeft() && x_next == -1 || intersection.isRight() && x_next == 1
+                || intersection.isUp(this) && y_next == -1 || intersection.isDown() && y_next == 1)) {
+            changeDirection();
+            moveHorizontal();
+            moveVertical();
+        } else {
+            intersection = null;
+        }
+        if (intersection != null)
+            return;
+        super.move();
     }
 }

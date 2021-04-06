@@ -3,6 +3,8 @@ package io.resch.pacman.movable;
 import io.resch.pacman.gui.*;
 import io.resch.pacman.utils.Utils;
 
+import java.awt.*;
+
 /**
  * Created by Andreas on 09.04.16.
  * Pink Ghost
@@ -10,14 +12,8 @@ import io.resch.pacman.utils.Utils;
 public class Pinky extends Ghost {
 
     public Pinky() {
-        super(Type.PINKY);
-        startpos[0] = 240;
-        startpos[1] = 268;
-        setLocation(startpos[0], startpos[1]);
-        target[0] = 32;
-        target[1] = 0;
-        currentTarget[0] = targetinhouse[0];
-        currentTarget[1] = targetinhouse[1];
+        super(Type.PINKY, new Point(240, 268), new Point(32, 0));
+        currentTarget = new Point(targetInHouse.x, targetInHouse.y);
     }
 
     @Override
@@ -31,7 +27,7 @@ public class Pinky extends Ghost {
 
     @Override
     public void calculateTarget() {
-        if (getCurrentMode() == Mode.CHASE) {
+        if (getCurrentMode().equals(Mode.CHASE)) {
             int x = 0;
             int y = 0;
             switch (PacmanGUI.pacman.getX_speed()) {
@@ -42,7 +38,7 @@ public class Pinky extends Ghost {
                 case -1 -> y = -4 * Utils.RESOLUTION;
                 case 1 -> y = 4 * Utils.RESOLUTION;
             }
-            setCurrentTarget(new int[]{PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y});
+            setCurrentTarget(new Point(PacmanGUI.pacman.getX() + x, PacmanGUI.pacman.getY() + y));
         } else {
             super.calculateTarget();
         }

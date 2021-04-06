@@ -22,7 +22,7 @@ public class Dot extends BoardItem {
 
     public static Dot create(String[] strings) {
         Point location = new Point(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]));
-        if (strings[0].equals("energizer.png"))
+        if (strings[0].equals("E"))
             return Energizer.create(location);
 
         return new Dot(Type.DOT, location);
@@ -32,14 +32,9 @@ public class Dot extends BoardItem {
         return points;
     }
 
-    /**
-     * Objekt stirbt, indem es sich selbständig vom contentPane des Formulars entfernt.
-     * Dadurch wird das Objekt auch nicht mehr angezeigt
-     */
-    public void die() {
-        if (!this.eaten && this.getParent() != null) {
-            this.getParent().remove(this);
-            this.eaten = true;
-        }
+    public void eaten() {
+        if (eaten)
+            return;
+        this.eaten = true;
     }
 }

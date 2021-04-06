@@ -13,7 +13,7 @@ public class Tile extends JComponent {
 
     public Tile(Point location) {
         setBounds(location.x, location.y, Utils.RESOLUTION, Utils.RESOLUTION);
-        setVisible(false);
+        setVisible(true);
     }
 
     public void paint(Graphics g) {
