@@ -4,6 +4,7 @@ package io.resch.pacman.board;
 import io.resch.pacman.movable.Ghost;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Wave {
 
@@ -20,7 +21,10 @@ public class Wave {
     }
 
     public void setModes(List<Ghost> ghosts) {
-        ghosts.forEach(ghost -> ghost.changeModeTo(mode));
+        ghosts.stream()
+                .filter(Objects::nonNull)
+                .filter(ghost -> !ghost.getCurrentMode().equals(Ghost.Mode.FRIGHTENED))
+                .forEach(ghost -> ghost.changeModeTo(mode));
     }
 }
 

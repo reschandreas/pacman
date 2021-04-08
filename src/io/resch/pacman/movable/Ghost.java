@@ -7,7 +7,6 @@ import io.resch.pacman.board.way.Distance;
 import java.awt.Image;
 import java.awt.Point;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +25,7 @@ public abstract class Ghost extends MovableBoardItem {
     }
 
     protected Image imageFrightened = null;
+    protected Image imageNormal = null;
 
     protected Mode currentMode = Mode.SCATTER;
     protected Mode previousMode = Mode.CHASE;
@@ -41,6 +41,7 @@ public abstract class Ghost extends MovableBoardItem {
     public Ghost(Type type, Point startPosition, Point target) {
         super(type, startPosition);
         try {
+            this.imageNormal = loadImage(type.label);
             this.imageFrightened = loadImage(Type.FRIGHTENED.label);
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,7 +72,7 @@ public abstract class Ghost extends MovableBoardItem {
     }
 
     public void getsEaten() {
-        setImage(image);
+        setImage(imageNormal);
         changeModeTo(getPreviousMode());
         start();
     }
@@ -93,8 +94,8 @@ public abstract class Ghost extends MovableBoardItem {
 
         Intersection i = intersectionCheck();
         Direction currentDirection = getCurrentDirection();
-        Distance way = null;
-        List<Distance> distances = new ArrayList<>();
+        Distance way;
+        List<Distance> distances;
         if (i != null) {
             if (i.getX() == 88 && i.getY() == 120) {
                 way = new Distance(RIGHT, 0);
@@ -154,7 +155,6 @@ public abstract class Ghost extends MovableBoardItem {
     }
 
     public void changeModeTo(Mode mode) {
-        setImage(image);
         if (mode.equals(currentMode)) {
             return;
         }
@@ -171,12 +171,13 @@ public abstract class Ghost extends MovableBoardItem {
     }
 
     private void setMode(Mode mode) {
-        previousMode = currentMode;
+        if (!currentMode.equals(Mode.FRIGHTENED))
+            previousMode = currentMode;
         this.currentMode = mode;
     }
 
     protected void chaseMode() {
-        setImage(image);
+        setImage(imageNormal);
         repaint();
         if (previousMode.equals(Mode.SCATTER))
             reverse();
@@ -184,7 +185,7 @@ public abstract class Ghost extends MovableBoardItem {
     }
 
     protected void scatterMode() {
-        setImage(image);
+        setImage(imageNormal);
         repaint();
         if (previousMode.equals(Mode.CHASE))
             reverse();
@@ -209,5 +210,9 @@ public abstract class Ghost extends MovableBoardItem {
     @Override
     public boolean isEatable() {
         return currentMode.equals(Mode.FRIGHTENED);
+    }
+
+    public Ghost reincarnate() {
+        return null;
     }
 }

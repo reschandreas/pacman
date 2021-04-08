@@ -26,6 +26,16 @@ public class Inky extends Ghost {
     }
 
     @Override
+    public void move() {
+        if (isInsideHouse()) {
+            setTarget(Ghost.targetInHouse);
+        } else if (getTarget().equals(Ghost.targetOutHouse)) {
+            calculateTarget();
+        }
+        super.move();
+    }
+
+    @Override
     public void calculateTarget() {
         if (getCurrentMode().equals(Mode.CHASE)) {
             int targetx = 0;
@@ -46,5 +56,10 @@ public class Inky extends Ghost {
         } else {
             super.calculateTarget();
         }
+    }
+
+    @Override
+    public Ghost reincarnate() {
+        return new Inky();
     }
 }

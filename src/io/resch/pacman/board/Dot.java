@@ -1,6 +1,10 @@
 package io.resch.pacman.board;
 
+import io.resch.pacman.utils.Utils;
+
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -36,5 +40,12 @@ public class Dot extends BoardItem {
         if (eaten)
             return;
         this.eaten = true;
+    }
+
+    public static List<Dot> readDotsFile() {
+        return Utils.readFile("data/dots.data")
+                .stream()
+                .map(line -> Dot.create(line.split(";")))
+                .collect(Collectors.toList());
     }
 }

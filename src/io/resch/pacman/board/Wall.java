@@ -1,11 +1,13 @@
 package io.resch.pacman.board;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
+import io.resch.pacman.utils.Utils;
+
 import java.io.InputStream;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Created by Andreas on 03.04.16.
@@ -25,5 +27,12 @@ public class Wall extends BoardItem {
         }
         wall.setBounds(Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), wall.getWidth(), wall.getHeight());
         return wall;
+    }
+
+    public static List<Wall> readWallsFile() {
+        return Utils.readFile("data/maze.data")
+                .stream()
+                .map(line -> Wall.create(line.split(";")))
+                .collect(Collectors.toList());
     }
 }

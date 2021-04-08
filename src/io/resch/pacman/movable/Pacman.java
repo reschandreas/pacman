@@ -1,5 +1,6 @@
 package io.resch.pacman.movable;
 
+import io.resch.pacman.board.Dot;
 import io.resch.pacman.board.Intersection;
 
 import java.awt.*;
@@ -146,6 +147,11 @@ public class Pacman extends MovableBoardItem {
 
     public void setPoints(long points) {
         this.points = points;
+    }
+
+    public boolean isEating(Dot dot) {
+        return getRealX() - 2 == dot.getX() && getRealY() - 2 == dot.getY()
+                || getRealX() - 8 == dot.getX() && getRealY() - 8 == dot.getY();
     }
 
     @Override

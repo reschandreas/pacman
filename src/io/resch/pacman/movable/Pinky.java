@@ -43,4 +43,9 @@ public class Pinky extends Ghost {
             super.calculateTarget();
         }
     }
+
+    @Override
+    public Ghost reincarnate() {
+        return new Pinky();
+    }
 }

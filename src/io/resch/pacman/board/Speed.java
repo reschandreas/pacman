@@ -1,5 +1,7 @@
 package io.resch.pacman.board;
 
+import io.resch.pacman.movable.Ghost;
+
 public class Speed {
 
     public enum Type {
@@ -34,5 +36,15 @@ public class Speed {
 
     public void setValue(double value) {
         this.value = value;
+    }
+
+    public static Speed.Type getCurrentType(boolean eaten, boolean ghostsFrightened) {
+        if (!eaten && ghostsFrightened)
+            return Speed.Type.FRIGHT;
+        if (eaten && ghostsFrightened)
+            return Speed.Type.DOT_FRIGHT;
+        if (!eaten) {
+            return Speed.Type.NORMAL;
+        } else return Speed.Type.DOT_NORMAL;
     }
 }

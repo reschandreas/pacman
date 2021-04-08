@@ -25,6 +25,16 @@ public class Clyde extends Ghost {
     }
 
     @Override
+    public void move() {
+        if (isInsideHouse()) {
+            setTarget(Ghost.targetOutHouse);
+        } else if (getTarget().equals(Ghost.targetOutHouse)) {
+            calculateTarget();
+        }
+        super.move();
+    }
+
+    @Override
     public void calculateTarget() {
         if (getCurrentMode().equals(Mode.CHASE)) {
             if (Utils.pythagoras(new Point(PacmanGUI.pacman.getRealX(), PacmanGUI.pacman.getRealY()), getRealX(), getRealY()) >= 8 * Utils.RESOLUTION) {
@@ -35,5 +45,10 @@ public class Clyde extends Ghost {
         } else {
             super.calculateTarget();
         }
+    }
+
+    @Override
+    public Ghost reincarnate() {
+        return new Clyde();
     }
 }

@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static io.resch.pacman.board.way.Direction.*;
 import static io.resch.pacman.board.way.Direction.RIGHT;
@@ -109,5 +110,12 @@ public class Intersection extends JComponent {
     @Override
     public int hashCode() {
         return Objects.hash(directions, upforbiddenForGhosts);
+    }
+
+    public static List<Intersection> readIntersectionsFile() {
+        return Utils.readFile("data/intersections.data")
+                .stream()
+                .map(line -> Intersection.create(line.split(";")))
+                .collect(Collectors.toList());
     }
 }

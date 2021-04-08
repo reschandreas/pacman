@@ -29,4 +29,9 @@ public class Blinky extends Ghost {
             super.calculateTarget();
         }
     }
+
+    @Override
+    public Ghost reincarnate() {
+        return new Blinky();
+    }
 }
