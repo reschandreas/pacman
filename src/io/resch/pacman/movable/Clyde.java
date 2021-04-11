@@ -27,7 +27,7 @@ public class Clyde extends Ghost {
     @Override
     public void move() {
         if (isInsideHouse()) {
-            setTarget(Ghost.targetOutHouse);
+            setCurrentTarget(Ghost.targetOutHouse);
         } else if (getTarget().equals(Ghost.targetOutHouse)) {
             calculateTarget();
         }

@@ -11,7 +11,7 @@ public class Navigator {
         if (distances.isEmpty()) {
             return null;
         }
-        Optional<Distance> minimal = distances.stream().min(Comparator.comparingDouble(Distance::getDistance));
+        Optional<Distance> minimal = distances.stream().min(Comparator.comparingDouble(Distance::distance));
         return minimal.get();
     }
 

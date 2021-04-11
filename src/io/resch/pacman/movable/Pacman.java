@@ -2,6 +2,8 @@ package io.resch.pacman.movable;
 
 import io.resch.pacman.board.Dot;
 import io.resch.pacman.board.Intersection;
+import io.resch.pacman.board.way.Direction;
+import io.resch.pacman.board.way.Navigator;
 
 import java.awt.*;
 import java.io.IOException;
@@ -168,5 +170,34 @@ public class Pacman extends MovableBoardItem {
         if (intersection != null)
             return;
         super.move();
+    }
+
+    private void instantDirectionChange(Direction direction) {
+        if (direction.equals(Navigator.getOpposite(getCurrentDirection())))
+            changeDirection();
+    }
+
+    @Override
+    public void goUp() {
+        super.goUp();
+        instantDirectionChange(Direction.UP);
+    }
+
+    @Override
+    public void goDown() {
+        super.goDown();
+        instantDirectionChange(Direction.DOWN);
+    }
+
+    @Override
+    public void goLeft() {
+        super.goLeft();
+        instantDirectionChange(Direction.LEFT);
+    }
+
+    @Override
+    public void goRight() {
+        super.goRight();
+        instantDirectionChange(Direction.RIGHT);
     }
 }

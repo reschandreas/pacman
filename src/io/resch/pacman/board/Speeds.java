@@ -1,7 +1,5 @@
 package io.resch.pacman.board;
 
-import io.resch.pacman.movable.Ghost;
-
 // https://www.gamasutra.com/view/feature/132330/the_pacman_dossier.php?page=3
 public final class Speeds {
 

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class SpeedLimits {
 
-    private List<Speed> speeds;
+    private final List<Speed> speeds;
 
     public SpeedLimits(Speed... speeds) {
         this.speeds = Arrays.asList(speeds.clone());

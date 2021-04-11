@@ -28,7 +28,7 @@ public class Inky extends Ghost {
     @Override
     public void move() {
         if (isInsideHouse()) {
-            setTarget(Ghost.targetInHouse);
+            setCurrentTarget(Ghost.targetInHouse);
         } else if (getTarget().equals(Ghost.targetOutHouse)) {
             calculateTarget();
         }

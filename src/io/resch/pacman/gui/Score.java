@@ -1,5 +1,7 @@
 package io.resch.pacman.gui;
 
+import io.resch.pacman.board.Player;
+
 /**
  * Created by Andreas on 16.05.16.
  */
@@ -8,6 +10,10 @@ public class Score {
     private String name = null;
     private long score = 0;
     private int level = 1;
+
+    public Score(Player player) {
+        this(player.getName(), player.getLevel(), player.getPoints());
+    }
 
     public Score(String name, int level, long score) {
         if (name != null && !name.isEmpty())

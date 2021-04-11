@@ -23,7 +23,7 @@ import static io.resch.pacman.board.way.Direction.RIGHT;
 public class Intersection extends JComponent {
 
     private final List<Direction> directions = new ArrayList<>(4);
-    private boolean upforbiddenForGhosts = false;
+    private final boolean upForbiddenForGhosts;
 
     public Intersection(Point location, boolean[] allowedDirections, boolean upforbiddenForGhosts) {
         setBounds(location.x, location.y, 2 * Utils.RESOLUTION, 2 * Utils.RESOLUTION);
@@ -39,7 +39,7 @@ public class Intersection extends JComponent {
         if (allowedDirections[3]) {
             directions.add(Direction.LEFT);
         }
-        this.upforbiddenForGhosts = upforbiddenForGhosts;
+        this.upForbiddenForGhosts = upforbiddenForGhosts;
         setVisible(false);
     }
 
@@ -56,7 +56,7 @@ public class Intersection extends JComponent {
     }
 
     public void paint(Graphics g) {
-        if (upforbiddenForGhosts)
+        if (upForbiddenForGhosts)
             g.setColor(Color.blue);
         else
             g.setColor(Color.white);
@@ -76,7 +76,7 @@ public class Intersection extends JComponent {
     }
 
     public boolean isUp(MovableBoardItem requester) {
-        if (upforbiddenForGhosts && requester instanceof Ghost) {
+        if (upForbiddenForGhosts && requester instanceof Ghost) {
             return false;
         }
         return directions.contains(Direction.UP);
@@ -104,12 +104,12 @@ public class Intersection extends JComponent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Intersection that = (Intersection) o;
-        return upforbiddenForGhosts == that.upforbiddenForGhosts && Objects.equals(directions, that.directions);
+        return upForbiddenForGhosts == that.upForbiddenForGhosts && Objects.equals(directions, that.directions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(directions, upforbiddenForGhosts);
+        return Objects.hash(directions, upForbiddenForGhosts);
     }
 
     public static List<Intersection> readIntersectionsFile() {

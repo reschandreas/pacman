@@ -1,7 +1,5 @@
 package io.resch.pacman.board;
 
-import io.resch.pacman.movable.Ghost;
-
 public class Speed {
 
     public enum Type {
@@ -34,8 +32,8 @@ public class Speed {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public SleepTime getSleepTime(double speed) {
+        return SleepTime.create(speed * getValue());
     }
 
     public static Speed.Type getCurrentType(boolean eaten, boolean ghostsFrightened) {

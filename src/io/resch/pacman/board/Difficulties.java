@@ -15,7 +15,7 @@ public final class Difficulties {
     static {
         one = new Difficulty(
                 new Wave(0, Ghost.Mode.SCATTER),       // 07s
-                new Wave(7000, Ghost.Mode.CHASE),      // 20s
+                new Wave(7000 * 2000, Ghost.Mode.CHASE),      // 20s
                 new Wave(27000, Ghost.Mode.SCATTER),   // 07s
                 new Wave(34000, Ghost.Mode.CHASE),     // 20s
                 new Wave(54000, Ghost.Mode.SCATTER),   // 05s

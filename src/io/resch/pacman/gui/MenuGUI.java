@@ -1,5 +1,6 @@
 package io.resch.pacman.gui;
 
+import io.resch.pacman.board.Player;
 import io.resch.pacman.movable.*;
 
 import javax.swing.*;
@@ -132,9 +133,7 @@ public class MenuGUI extends JFrame {
 
     private void startGame() {
         if (tf_name.getText() != null && !tf_name.getText().isEmpty() && !tf_name.getText().equals("Dein Name")) {
-            PacmanGUI.playerpoints = 0;
-            PacmanGUI.playername = tf_name.getText();
-            new PacmanGUI();
+            new PacmanGUI(new Player(tf_name.getText()));
             jFrame.dispose();
         } else {
             final JDialog dialog = new JDialog();

@@ -6,15 +6,7 @@ import io.resch.pacman.movable.Ghost;
 import java.util.List;
 import java.util.Objects;
 
-public class Wave {
-
-    private final long offset;
-    private final Ghost.Mode mode;
-
-    public Wave(long offset, Ghost.Mode mode) {
-        this.offset = offset;
-        this.mode = mode;
-    }
+public record Wave(long offset, Ghost.Mode mode) {
 
     public long getOffset() {
         return offset;

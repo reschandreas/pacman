@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Difficulty {
 
-    private List<Wave> waves;
+    private final List<Wave> waves;
 
     public Difficulty(Wave... waves) {
         this.waves = Arrays.asList(waves.clone());

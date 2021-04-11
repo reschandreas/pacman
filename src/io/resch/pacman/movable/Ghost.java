@@ -74,6 +74,7 @@ public abstract class Ghost extends MovableBoardItem {
     public void getsEaten() {
         setImage(imageNormal);
         changeModeTo(getPreviousMode());
+        startPosition = new Point(240, 268);
         start();
     }
 
@@ -102,7 +103,7 @@ public abstract class Ghost extends MovableBoardItem {
             } else {
                 distances = i.getAllowedDirections(this, currentTarget)
                         .stream()
-                        .filter(d -> !d.getDirection().equals(getOpposite(currentDirection)))
+                        .filter(d -> !d.direction().equals(getOpposite(currentDirection)))
                         .collect(Collectors.toList());
                 if (!currentMode.equals(Mode.FRIGHTENED)) {
                     way = getBestDirection(distances);
@@ -113,7 +114,7 @@ public abstract class Ghost extends MovableBoardItem {
                     return;
                 }
             }
-            switch (way.getDirection()) {
+            switch (way.direction()) {
                 case UP -> goUp();
                 case DOWN -> goDown();
                 case LEFT -> goLeft();
